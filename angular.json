@@ -10,6 +10,7 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
+          "type": "component",
           "style": "scss",
           "skipTests": true
         },
@@ -89,7 +90,10 @@
               "buildTarget": "snake-game:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "hmr": false
+          }
         }
       }
     }
