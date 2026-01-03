@@ -1,0 +1,14 @@
+@use '../../../../scss' as *;
+
+:host {
+  gap: 10px;
+  @include tab;
+  & > * {
+    animation: fade-in .3s;
+  }
+}
+
+.tab-headers {
+  display: flex;
+  gap: 10px;
+}

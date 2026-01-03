@@ -1,0 +1,25 @@
+@use '../../../../scss' as *;
+
+:host {
+  @include tab;
+}
+
+section {
+  margin: 10px 0;
+  gap: 6px;
+  padding: 0 5px;
+}
+
+.asset-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  background-color: $bg-base;
+  border: 1px solid $border-normal;
+  transition: .2s;
+  cursor: pointer;
+  &.selected {
+    border-color: green;
+  }
+}

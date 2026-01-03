@@ -1,0 +1,45 @@
+@use './base' as *;
+
+h3 {
+  margin-top: 5px;
+  padding: 0 5px;
+  font-size: 18px;
+  font-weight: 400;
+  border-bottom: 1px solid $border-normal;
+}
+
+section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  &.column {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+}
+
+label {
+  padding: 0 5px;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 3px 6px;
+  border: 1px solid $border-normal;
+  border-radius: 4px;
+  background-color: $bg-input;
+  color: $text-normal;
+  font-size: 15px;
+  font-family: inherit;
+  &:focus {
+    outline: none;
+  }
+}
+
+textarea {
+  resize: none;
+}

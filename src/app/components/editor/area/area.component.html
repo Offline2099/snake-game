@@ -1,0 +1,88 @@
+<!-- Horizontal Ruler (Top) -->
+<ng-template
+  [ngTemplateOutlet]="ruler"
+  [ngTemplateOutletContext]="{ orientation: RulerOrientation.horizontal }"
+/>
+
+<div class="middle-wrapper">
+
+  <!-- Vertical Ruler (Left) -->
+  <ng-template
+    [ngTemplateOutlet]="ruler"
+    [ngTemplateOutletContext]="{ orientation: RulerOrientation.vertical }"
+  />
+
+  <!-- Game Space Area -->
+  <div
+    class="game-space"
+    (mousemove)="onMousePositionChange($event)"
+    (mouseleave)="setDefaultMousePosition()"
+    (click)="onMapLeftClick()"
+    (contextmenu)="onMapRightClick($event)">
+
+    <!-- Entities -->
+    @for (entity of level().entities; track $index) {
+      <app-asset-block
+        class="game-block"
+        [type]="entity.block.type"
+        [subType]="entity.block.subType"
+        [ngStyle]="{
+          'left.px': BLOCK_SIZE * entity.position.x,
+          'bottom.px': BLOCK_SIZE * entity.position.y
+        }"
+      />
+    }
+
+    <!-- Temporary Entities -->
+    @for (entity of temporaryArray; track $index) {
+      <app-asset-block
+        class="game-block temporary"
+        [type]="entity.block.type"
+        [subType]="entity.block.subType"
+        [ngStyle]="{
+          'left.px': BLOCK_SIZE * entity.position.x,
+          'bottom.px': BLOCK_SIZE * entity.position.y
+        }"
+      />
+    }
+
+    <!-- Position Tracker -->
+    <div
+      class="position-tracker"
+      [ngClass]="{ 'invisible': mousePx.x < 0 || mousePx.y < 0 }"
+      [ngStyle]="{
+        'left.px': mousePx.x + TRACKER_SHIFT,
+        'top.px': mousePx.y + TRACKER_SHIFT
+      }">
+      <ng-container>x: {{mousePosition.x}}, y: {{mousePosition.y}}</ng-container>
+    </div>
+
+  </div>
+
+  <!-- Vertical Ruler (Right) -->
+  <ng-template
+    [ngTemplateOutlet]="ruler"
+    [ngTemplateOutletContext]="{ orientation: RulerOrientation.vertical }"
+  />
+  
+</div>
+
+<!-- Horizontal Ruler (Bottom) -->
+<ng-template
+  [ngTemplateOutlet]="ruler"
+  [ngTemplateOutletContext]="{ orientation: RulerOrientation.horizontal }"
+/>
+
+<!-- Template: Ruler -->
+<ng-template #ruler let-orientation="orientation">
+  <div
+    class="ruler"
+    [ngClass]="{
+      'horizontal': orientation === RulerOrientation.horizontal,
+      'vertical': orientation === RulerOrientation.vertical
+    }">
+    @for (block of [].constructor(AREA_SIZE); track $index) {
+      <span>{{ $index }}</span>
+    }
+  </div>  
+</ng-template>
