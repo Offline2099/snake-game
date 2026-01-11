@@ -1,6 +1,6 @@
-import { EnemyData } from "../../types/enemy-data.interface";
-import { DamageType } from "./damage-type.enum";
-import { EnemyType } from "./enemy-type.enum";
+import { EnemyType } from './enemy-type.enum';
+import { DamageType } from './damage-type.enum';
+import { EnemyData } from '../../types/enemy-data.interface';
 
 export const ENEMY_DATA: Record<EnemyType, EnemyData> = {
   [EnemyType.shit]: {
@@ -12,5 +12,5 @@ export const ENEMY_DATA: Record<EnemyType, EnemyData> = {
     name: 'Fire',
     damage: 5,
     damageType: DamageType.fire
-  },
+  }
 }

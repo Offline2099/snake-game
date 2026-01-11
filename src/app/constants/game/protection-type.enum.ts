@@ -1,4 +1,4 @@
-export enum ProtectedMarginTypeId {
+export enum ProtectionType {
   noEnemySpawn = 1,
   noFoodSpawn
 }

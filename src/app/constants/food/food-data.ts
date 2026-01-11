@@ -1,5 +1,5 @@
-import { FoodData } from '../../types/food-data.interface';
 import { FoodType } from './food-type.enum';
+import { FoodData } from '../../types/food-data.interface';
 
 export const FOOD_DATA: Record<FoodType, FoodData> = {
   [FoodType.normal]: {

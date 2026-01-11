@@ -3,8 +3,8 @@ export enum EditorInputId {
   levelId = 'level-id-input',
   levelName = 'level-name-input',
   levelInstructions = 'level-instructions',
-  boundaryMargin = 'boundary-margin-',
-  obstacleMargin = 'obstacle-margin-',
+  perimeterMargin = 'perimeter-margin-',
+  protectedMargin = 'protected-margin-',
   goal = 'level-goal',
   food = 'food-',
   enemies = 'enemies-'

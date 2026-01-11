@@ -1,0 +1,31 @@
+<!-- Level Header -->
+<div>
+  <h2>Level {{ level().id }}: {{ level().name }}</h2>
+</div>
+
+<div class="wrapper">
+
+  <!-- Left Column -->
+  <div class="side-column">
+    <app-game-stats [game]="game" [level]="level()" [snake]="snake" />
+  </div>
+
+  <!-- Central Column -->
+  <div class="main-column">
+    <app-game-progress [progress]="game.progress" [goal]="level().settings.goal" />
+    <app-game-area [game]="game" />
+  </div>
+
+  <!-- Right Column -->
+  <div class="side-column">
+    <app-game-instructions [level]="level()" />
+    <app-game-controls 
+      [game]="game"
+      (start)="startTimer()"
+      (pause)="stopTimer()"
+      (reset)="resetGame()"
+      (toMenu)="showMenu()"
+    />
+  </div>
+
+</div>

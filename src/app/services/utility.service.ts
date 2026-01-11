@@ -10,4 +10,9 @@ export class UtilityService {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  /** Returns a random element from the given array. */
+  randomFromArray<T>(array: T[]): T {
+    return array[this.randomInteger(0, array.length - 1)];
+  }
+
 }

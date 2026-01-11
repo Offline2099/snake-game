@@ -1,0 +1,21 @@
+<div class="label">Progress: </div>
+<div class="progress-bar-container">
+  <div
+    class="progress-bar"
+    [ngClass]="{
+      'delayed negative': latestChange < 0,
+      'positive': latestChange > 0
+    }"
+    [ngStyle]="{'width': percentage() + '%'}">
+  </div>
+  <div
+    class="progress-bar"
+    [ngClass]="{'delayed': latestChange > 0}"
+    [ngStyle]="{'width': percentage() + '%'}">
+  </div>
+</div>
+<div class="label value">
+  <div class="absolute">{{ progress() }} / {{ goal() }}</div>
+  <div class="percentage">({{ percentage() }}%)</div>
+</div>
+

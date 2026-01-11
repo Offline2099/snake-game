@@ -1,0 +1,24 @@
+<div class="default-controls">
+  <button type="button" (click)="startGame()">Start</button>
+  <button type="button" (click)="showMenu()">Menu</button>
+</div>
+
+@if (game().isDefeat) {
+  <div class="controls-overlay fail">
+    <div class="overlay-header">YOU DIED</div>
+    <div class="overlay-buttons">
+      <button type="button" (click)="resetGame()">Try Again</button>
+      <button type="button" (click)="showMenu()">Menu</button>
+    </div>
+  </div>
+}
+
+@if (game().isVictory) {
+  <div class="controls-overlay victory">
+    <div class="overlay-header">VICTORY</div>
+    <div class="overlay-buttons">
+      <button type="button" (click)="resetGame()">Play Again</button>
+      <button type="button" (click)="showMenu()">Continue</button>
+    </div>
+  </div>
+}

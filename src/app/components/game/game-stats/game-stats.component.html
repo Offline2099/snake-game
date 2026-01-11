@@ -1,0 +1,97 @@
+<h3>Snake</h3>
+
+<div class="section">
+  <div class="section-line">
+    <span>Elapsed time:</span>
+    <span>{{game().stats.elapsedTime | secondsAsTime }}</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-line">
+    <span>Distance traveled:</span>
+    <span>{{ game().stats.stepsDone }}</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-line"> 
+    <span>Snake length:</span>
+    <span>{{ snake().body.length + 2 }}</span>
+  </div>
+</div>
+
+<h3>Food</h3>
+
+<div class="section">
+  <div class="section-line"> 
+    <span>Total food eaten:</span>
+    <span>{{ game().stats.totalFoodEaten }}</span>
+  </div>
+  <div class="section-line"> 
+    <span>Total value consumed:</span>
+    <span>{{ game().stats.totalFoodValue }}</span>
+  </div>
+</div>
+
+<div class="section">
+  @for (foodType of foodTypes; track $index) {
+    @if (game().stats.food[foodType].present || game().stats.food[foodType].consumed) {
+      <h4>
+        <app-asset-block [type]="GameBlockType.food" [subType]="foodType" />
+        <span>{{ FOOD_DATA[foodType].name }}</span>
+      </h4>
+      <div class="section-line"> 
+        <span>Available:</span>
+        <span>{{ game().stats.food[foodType].present }}</span>
+      </div>
+      <div class="section-line"> 
+        <span>Eaten:</span>
+        <span>{{ game().stats.food[foodType].consumed }}</span>
+      </div>
+      <div class="section-line"> 
+        <span>Total value:</span>
+        <span>{{ game().stats.food[foodType].valueConsumed }}</span>
+      </div>
+    }
+  }
+</div>
+
+@if (levelHasEnemies()) {
+  <h3>Enemies</h3>
+
+  <div class="section">
+    <div class="section-line"> 
+      <span>Total enemies hit:</span>
+      <span>{{ game().stats.totalEnemiesHit }}</span>
+    </div>
+    <div class="section-line"> 
+      <span>Total damage taken:</span>
+      <span>{{ game().stats.totalDamageTaken }}</span>
+    </div>
+  </div>
+
+  <div class="section">
+    @for (enemyType of enemyTypes; track $index) {
+      @if (game().stats.enemies[enemyType].present || game().stats.enemies[enemyType].hit) {
+        <h4>
+          <app-asset-block [type]="GameBlockType.enemy" [subType]="enemyType" />
+          <span>{{ ENEMY_DATA[enemyType].name }}</span>
+        </h4>
+        <div class="section-line"> 
+          <span>Present:</span>
+          <span>{{ game().stats.enemies[enemyType].present }}</span>
+        </div>
+        <div class="section-line"> 
+          <span>Hit:</span>
+          <span>{{ game().stats.enemies[enemyType].hit }}</span>
+        </div>
+        <div class="section-line"> 
+          <span>Damage taken:</span>
+          <span>{{ game().stats.enemies[enemyType].damageTaken }}</span>
+        </div>
+      }
+    }
+  </div>
+}
+

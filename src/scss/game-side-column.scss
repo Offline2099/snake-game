@@ -1,0 +1,52 @@
+@use './base' as *;
+
+.section {
+  margin: 5px 0;
+}
+
+.section-line {
+  display: flex;
+  padding-left: 5px;
+  border-bottom: 1px solid $border-dim;
+  font-size: 15px;
+  letter-spacing: .05em;
+  span:last-child{
+    margin-left: auto;
+  }
+}
+
+h3 {
+  margin-top: 40px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid $border-normal;
+  letter-spacing: .05em;
+}
+
+h4 {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 7px 0 2px 0;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: .05em;
+}
+
+ul {
+  margin: 10px 0 0 20px;
+  font-size: 15px;
+  li {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid $border-dim;
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
+}
+
+.section app-asset-block {
+  width: 15px;
+  height: 15px;
+  margin-bottom: 2px;
+}

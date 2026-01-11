@@ -1,15 +1,24 @@
-import { Level } from '../../types/level/level.interface';
+import { GameBlockType } from '../game/game-block-type.enum';
 import { EnemyType } from '../enemies/enemy-type.enum';
 import { FoodType } from '../food/food-type.enum';
+import { ProtectionType } from '../game/protection-type.enum';
 import { DEFAULT_ENTITY_PARAMETERS } from './default-entity-parameters';
 import { DEFAULT_PROTECTED_MARGIN } from './default-protected-margin';
+import { LevelData } from '../../types/level/level-data.interface';
 
-export const DEFAULT_LEVEL: Level = {
+export const DEFAULT_LEVEL_DATA: LevelData = {
   id: 1,
-  name: 'Level Name',
   instructions: ['Instructions'],
-  protectedBoundaryMargin: { ...DEFAULT_PROTECTED_MARGIN },
-  protectedObstacleMargin: { ...DEFAULT_PROTECTED_MARGIN },  
+  perimeterProtection: { ...DEFAULT_PROTECTED_MARGIN },
+  protectedMargins: {
+    [GameBlockType.obstacle]: { ...DEFAULT_PROTECTED_MARGIN },
+    [GameBlockType.portal]: { 
+      [ProtectionType.noEnemySpawn]: 1,
+      [ProtectionType.noFoodSpawn]: 1
+    },
+    [GameBlockType.enemy]: { ...DEFAULT_PROTECTED_MARGIN },
+    [GameBlockType.food]: { ...DEFAULT_PROTECTED_MARGIN }
+  },  
   goal: 5,
   food: {
     [FoodType.normal]: { ...DEFAULT_ENTITY_PARAMETERS },

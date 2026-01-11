@@ -11,14 +11,6 @@ export class FileService {
     fileInput.click();
   }
 
-  // readUserJSON<T extends {}>(obj: T, event: Event): void {
-  //   const files: FileList | null = (event.target as HTMLInputElement).files;
-  //   if (!files || !files[0]) return;
-  //   const reader = new FileReader();
-  //   reader.onload = () => Object.assign(obj, JSON.parse(reader.result as string));
-  //   reader.readAsText(files[0]);
-  // }
-
   readUserJSON<T extends {}>(obj: T, event: Event, callback: (obj: T) => void): void {
     const files: FileList | null = (event.target as HTMLInputElement).files;
     if (!files || !files[0]) return;

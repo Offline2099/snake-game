@@ -1,1 +1,10 @@
-<p>game works!</p>
+@if (currentLevelIndex === null) {
+  <app-menu [levels]="levels" (selected)="startLevel($event)" />
+} @else {
+  <app-level
+    [level]="levels[currentLevelIndex]()"
+    [nextLevelId]="nextLevelId"
+    (victory)="onVictory()"
+    (toMenu)="showMenu()"
+  />
+}

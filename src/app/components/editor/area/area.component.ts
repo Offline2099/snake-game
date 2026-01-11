@@ -6,9 +6,9 @@ import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode
 // Interfaces & Types
 import { Position } from '../../../types/general/position.interface';
 import { Rectangle } from '../../../types/general/rectangle.interface';
-import { Level } from '../../../types/level/level.interface';
+import { LevelData } from '../../../types/level/level-data.interface';
 import { EntityData } from '../../../types/level/entity-data.interface';
-import { GameBlockData } from '../../../types/game/game-block-data.interface';
+import { GameBlockData } from '../../../types/game/space/game-block-data.interface';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
 // Services
@@ -39,7 +39,7 @@ export class AreaComponent {
   readonly RulerOrientation = RulerOrientation;
   readonly TRACKER_SHIFT = TRACKER_SHIFT;
 
-  level = model.required<Level>();
+  level = model.required<LevelData>();
   selectedAsset = input.required<GameBlockData | null>();
   selectedModeId = input.required<AssetPlacingModeId>();
 

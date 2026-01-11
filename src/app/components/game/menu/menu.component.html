@@ -1,0 +1,36 @@
+<div class="wrapper">
+  @for (level of levels(); track level().id) {
+    <div
+      class="level-block"
+      [ngClass]="{ 'locked': level().progression.isLocked }"
+      (click)="selectLevel(level().id)">
+
+      @if (level().progression.isLocked) {
+        <img class="block-icon lock" src="images/menu/lock.webp" alt="" />
+      } @else {
+        @if (level().progression.isComplete) {
+          <img class="block-icon" src="images/menu/checkmark.webp" alt="" />
+        }        
+      }
+
+      <div>Level {{ $index + 1 }}</div>
+      <div class="level-name">{{ level().name }}</div>
+
+      @if (!level().progression.isLocked) {
+        @if (level().progression.isComplete) {
+          <div class="progress-record">Best Time: {{ level().progression.bestTime | secondsAsTime }}</div>
+        } @else {
+          @if (level().progression.bestProgress) {
+            <div class="progress-record">
+              <ng-container>Best Attempt: </ng-container>
+              <ng-container>{{ level().progression.bestProgress }}</ng-container>
+              <ng-container>&hairsp;/&hairsp;</ng-container>
+              <ng-container>{{ level().settings.goal }}</ng-container>
+            </div>
+          }
+        }
+      }
+
+    </div>
+  }
+</div>

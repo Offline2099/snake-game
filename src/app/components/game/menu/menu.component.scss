@@ -1,0 +1,51 @@
+@use '../../../../scss' as *;
+
+:host {
+  @include page;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  width: 1200px;
+  margin: 50px auto;
+  gap: 10px;
+}
+
+.level-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  border-radius: 10px;
+  background: #223322;
+  transition: .2s;
+  cursor: pointer;
+  &.locked {
+    pointer-events: none;
+    background: #332222;
+  }
+  @include hover {
+    filter: brightness(1.1);
+  }
+}
+
+.block-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 20px;
+  &.lock {
+    filter: brightness(.7);
+  }
+}
+
+.level-name {
+  font-size: 20px;
+  letter-spacing: .05em;
+}
+
+.progress-record {
+  margin-top: 20px;
+  color: #999;
+}

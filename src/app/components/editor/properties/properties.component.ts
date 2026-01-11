@@ -5,36 +5,42 @@ import { form, Field } from '@angular/forms/signals';
 import { PROPERTY_TABS } from '../../../constants/editor/property-tabs';
 import { PropertyTabId } from '../../../constants/editor/property-tab-id.enum';
 import { EditorInputId } from '../../../constants/editor/editor-input-id.enum';
-import { ProtectedMarginTypeId } from '../../../constants/level/protected-margin-type-id.enum';
 import { EntityParameterId } from '../../../constants/level/entity-parameter-id.enum';
+import { GameBlockType } from '../../../constants/game/game-block-type.enum';
+import { ProtectionType } from '../../../constants/game/protection-type.enum';
 import { FoodType } from '../../../constants/food/food-type.enum';
 import { EnemyType } from '../../../constants/enemies/enemy-type.enum';
 import { FOOD_DATA } from '../../../constants/food/food-data';
 import { ENEMY_DATA } from '../../../constants/enemies/enemy-data';
 // Interfaces & Types
-import { Tab } from '../../../types/editor/editor-tab.interface';
-import { Level } from '../../../types/level/level.interface';
+import { EditorTab } from '../../../types/editor/editor-tab.interface';
+import { LevelData } from '../../../types/level/level-data.interface';
 
 interface PropertyForm {
   id: string;
-  name: string;
   instructions: string;
-  boundaryMargin: Record<ProtectedMarginTypeId, string>;
-  obstacleMargin: Record<ProtectedMarginTypeId, string>;
+  perimeterMargin: Record<ProtectionType, string>;
+  protectedMargins: Partial<Record<GameBlockType, Record<ProtectionType, string>>>;
   goal: string;
   food: Record<FoodType, Record<EntityParameterId, string>>;
   enemies: Record<EnemyType, Record<EntityParameterId, string>>;
 }
 
-const MARGIN_TYPE: Record<ProtectedMarginTypeId, string> = {
-  [ProtectedMarginTypeId.noEnemySpawn]: 'No enemy spawn',
-  [ProtectedMarginTypeId.noFoodSpawn]: 'No food spawn'
+const BLOCK_TYPE: Partial<Record<GameBlockType, string>> = {
+  [GameBlockType.obstacle]: 'Obstacles',
+  [GameBlockType.portal]: 'Portals',
+  [GameBlockType.enemy]: 'Enemies',
+  [GameBlockType.food]: 'Food'
+}
+
+const MARGIN_TYPE: Record<ProtectionType, string> = {
+  [ProtectionType.noEnemySpawn]: 'No enemy spawn',
+  [ProtectionType.noFoodSpawn]: 'No food spawn'
 }
 
 const ENTITY_PARAMETER: Record<EntityParameterId, string> = {
   [EntityParameterId.initialAmount]: 'Initial amount',
-  [EntityParameterId.spawnOnInteraction]: 'Spawn on interaction',
-  [EntityParameterId.protectedMargin]: 'Protected margin'
+  [EntityParameterId.spawnOnInteraction]: 'Spawn on interaction'
 }
 
 @Component({
@@ -48,28 +54,31 @@ export class PropertiesComponent {
   readonly PropertyTabId = PropertyTabId;
   readonly PROPERTY_TABS = PROPERTY_TABS;
   readonly EditorInputId = EditorInputId;
-  readonly ProtectedMarginTypeId = ProtectedMarginTypeId;
   readonly EntityParameterId = EntityParameterId;
+  readonly BLOCK_TYPE = BLOCK_TYPE;
   readonly MARGIN_TYPE = MARGIN_TYPE;
   readonly ENTITY_PARAMETER = ENTITY_PARAMETER;
   readonly FOOD_DATA = FOOD_DATA;
   readonly ENEMY_DATA = ENEMY_DATA;
 
-  level = model.required<Level>();
+  level = model.required<LevelData>();
 
   formModel = linkedSignal<PropertyForm>(() => ({
     id: this.level().id.toString(),
-    name: this.level().name,
     instructions: this.level().instructions.join('\n'),
-    boundaryMargin: this.convertRecordType<ProtectedMarginTypeId>(this.level().protectedBoundaryMargin),
-    obstacleMargin: this.convertRecordType<ProtectedMarginTypeId>(this.level().protectedObstacleMargin),
+    perimeterMargin: this.convertRecordType<ProtectionType>(this.level().perimeterProtection),
+    protectedMargins: 
+      this.convertNestedRecordType<GameBlockType, ProtectionType>(
+        this.level().protectedMargins as Record<GameBlockType, Record<ProtectionType, number>>
+      ),
     goal: this.level().goal.toString(),
     food: this.convertNestedRecordType<FoodType, EntityParameterId>(this.level().food),
     enemies: this.convertNestedRecordType<EnemyType, EntityParameterId>(this.level().enemies)
   }));
 
-  protectedMarginTypes: ProtectedMarginTypeId[] = Object.values(ProtectedMarginTypeId).filter(Number) as number[];
+  protectedMarginTypes: ProtectionType[] = Object.values(ProtectionType).filter(Number) as number[];
   editorEntityParameters: EntityParameterId[] = Object.values(EntityParameterId).filter(Number) as number[];
+  gameBlockTypes = computed<GameBlockType[]>(() => Object.keys(this.formModel().protectedMargins).map(Number)) 
   foodTypes = computed<FoodType[]>(() => Object.keys(this.formModel().food).map(Number));
   enemyTypes = computed<EnemyType[]>(() => Object.keys(this.formModel().enemies).map(Number));
 
@@ -77,7 +86,7 @@ export class PropertiesComponent {
 
   selectedTabId: PropertyTabId = PropertyTabId.main;
 
-  selectTab(tab: Tab): void {
+  selectTab(tab: EditorTab): void {
     this.selectedTabId = tab.id;
   }
 
@@ -92,7 +101,7 @@ export class PropertiesComponent {
     obj: Record<T, Record<U, number>>
   ): Record<T, Record<U, string>> {
     return Object.entries(obj).reduce((acc, [key, value]) => {
-      acc[key as unknown as T] = this.convertRecordType(value as Record<EntityParameterId, number>)
+      acc[key as unknown as T] = this.convertRecordType<U>(value as Record<U, number>)
       return acc;
     }, {} as Record<T, Record<U, string>>);
   }
@@ -100,19 +109,16 @@ export class PropertiesComponent {
   onChange(id: EditorInputId, id2?: string, id3?: string): void {
     switch (id) {
       case (EditorInputId.levelId):
-        this.level().id = Number(this.form.id().value());
-        break;
-      case (EditorInputId.levelName):
-        this.level().name = this.form.name().value();
+        this.level().id  = Number(this.form.id().value());
         break;
       case (EditorInputId.levelInstructions):
         this.level().instructions = this.form.instructions().value().split('\n');
         break;
-      case (EditorInputId.boundaryMargin):
-        this.setBoundaryMargin(Number(id2));
+      case (EditorInputId.perimeterMargin):
+        this.setPerimeterMargin(Number(id2));
         break;
-      case (EditorInputId.obstacleMargin):
-        this.setObstacleMargin(Number(id2));
+      case (EditorInputId.protectedMargin):
+        this.setProtectedMargin(Number(id2), Number(id3));
         break;
       case (EditorInputId.goal):
         this.level().goal = Number(this.form.goal().value());
@@ -126,20 +132,22 @@ export class PropertiesComponent {
     }
   }
 
-  setBoundaryMargin(type: ProtectedMarginTypeId): void {
-    this.level().protectedBoundaryMargin[type] = Number(this.form.boundaryMargin[type]().value());
+  setPerimeterMargin(protectionType: ProtectionType): void {
+    this.level().perimeterProtection[protectionType] = 
+      Number(this.form.perimeterMargin[protectionType]().value());
   }
 
-  setObstacleMargin(type: ProtectedMarginTypeId): void {
-    this.level().protectedObstacleMargin[type] = Number(this.form.obstacleMargin[type]().value());
+  setProtectedMargin(blockType: GameBlockType, protectionType: ProtectionType): void {
+    this.level().protectedMargins[blockType]![protectionType] = 
+      Number(this.form.protectedMargins[blockType]![protectionType]().value());
   }
 
-  setFoodParameter(type: FoodType, parameter: EntityParameterId): void {
-    this.level().food[type][parameter] = Number(this.form.food[type][parameter]().value());
+  setFoodParameter(foodType: FoodType, parameter: EntityParameterId): void {
+    this.level().food[foodType][parameter] = Number(this.form.food[foodType][parameter]().value());
   }
 
-  setEnemyParameter(type: EnemyType, parameter: EntityParameterId): void {
-    this.level().enemies[type][parameter] = Number(this.form.enemies[type][parameter]().value());
+  setEnemyParameter(enemyType: EnemyType, parameter: EntityParameterId): void {
+    this.level().enemies[enemyType][parameter] = Number(this.form.enemies[enemyType][parameter]().value());
   }
 
 }

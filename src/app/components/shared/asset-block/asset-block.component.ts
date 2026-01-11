@@ -1,7 +1,7 @@
 import { Component, HostBinding, input } from '@angular/core';
 import { GameBlockType } from '../../../constants/game/game-block-type.enum';
 import { BLOCK_CLASS } from '../../../constants/game/block-class';
-import { GameBlockSubType } from '../../../types/game/game-block-subtype.type';
+import { GameBlockSubType } from '../../../types/game/space/game-block-subtype.type';
 
 @Component({
   selector: 'app-asset-block',

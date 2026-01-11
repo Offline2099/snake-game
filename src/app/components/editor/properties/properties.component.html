@@ -5,7 +5,7 @@
       type="button"
       [ngClass]="{ 'selected': selectedTabId === tab.id }"
       (click)="selectTab(tab)">
-      {{tab.name}}
+      {{ tab.name }}
     </button>
   }
 </div>
@@ -24,16 +24,6 @@
         output: [EditorInputId.levelId]
       }"
     />
-    <ng-template
-      [ngTemplateOutlet]="textInput"
-      [ngTemplateOutletContext]="{
-        sectionClass: 'column',
-        id: EditorInputId.levelName,
-        label: 'Name',
-        field: form.name,
-        output: [EditorInputId.levelName]
-      }"
-    />
     <section  class="column">
       <label [for]="EditorInputId.levelInstructions">Instructions: </label>
       <textarea
@@ -47,29 +37,31 @@
 
   <!-- Obstacles -->
   @case (PropertyTabId.obstacles) {
-    <h3>Protected boundary margin</h3>
+    <h3>Protected perimeter</h3>
     @for (type of protectedMarginTypes; track $index) {
       <ng-template
         [ngTemplateOutlet]="textInput"
         [ngTemplateOutletContext]="{
-          id: EditorInputId.boundaryMargin + type,
+          id: EditorInputId.perimeterMargin + type,
           label: MARGIN_TYPE[type],
-          field: form.boundaryMargin[type],
-          output: [EditorInputId.boundaryMargin, type]
+          field: form.perimeterMargin[type],
+          output: [EditorInputId.perimeterMargin, type]
         }"
       />
     }
-    <h3>Protected obstacle margin</h3>
-    @for (type of protectedMarginTypes; track $index) {
-      <ng-template
-        [ngTemplateOutlet]="textInput"
-        [ngTemplateOutletContext]="{
-          id: EditorInputId.obstacleMargin + type,
-          label: MARGIN_TYPE[type],
-          field: form.obstacleMargin[type],
-          output: [EditorInputId.obstacleMargin, type]
-        }"
-      />
+    @for (blockType of gameBlockTypes(); track $index) {
+      <h3>{{ BLOCK_TYPE[blockType] }}</h3>
+      @for (marginType of protectedMarginTypes; track $index) {
+        <ng-template
+          [ngTemplateOutlet]="textInput"
+          [ngTemplateOutletContext]="{
+            id: EditorInputId.protectedMargin + blockType + '-' + marginType,
+            label: MARGIN_TYPE[marginType],
+            field: form.protectedMargins[blockType]![marginType],
+            output: [EditorInputId.protectedMargin, blockType, marginType]
+          }"
+        />
+      }
     }
   }
 
@@ -100,7 +92,7 @@
   <!-- Enemies -->
   @case (PropertyTabId.enemies) {
     @for (type of enemyTypes(); track $index) {
-      <h3>{{ENEMY_DATA[type].name}}</h3>
+      <h3>{{ ENEMY_DATA[type].name }}</h3>
       <ng-template
         [ngTemplateOutlet]="entityParameters"
         [ngTemplateOutletContext]="{
