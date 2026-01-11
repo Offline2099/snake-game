@@ -208,7 +208,7 @@ export class GameService {
         protection[protectionType] = true;
         return;
       }
-      [GameBlockType.food, GameBlockType.enemy].forEach(blockType => {
+      [GameBlockType.obstacle, GameBlockType.enemy, GameBlockType.food].forEach(blockType => {
         const margin: number = level.settings.protectedMargins[blockType]![protectionType];
         if (this.spaceService.isBlockNearby(space, position, blockType, margin)) {
           protection[protectionType] = true;
@@ -294,6 +294,8 @@ export class GameService {
     game.stats.enemies[enemyType].damageTaken += damage;
     game.stats.totalEnemiesHit++;
     game.stats.totalDamageTaken += damage;
+    const amount: number = level.settings.enemies[enemyType][EntityParameterId.spawnOnInteraction];
+    this.spawnEnemies(game, level, enemyType, amount);
     this.reduceSnake(game.space, level, snake, damage);
     this.updateGameProgress(game, level, -damage);
     if (damage >= lengthBeforeDamage) {

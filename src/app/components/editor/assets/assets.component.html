@@ -11,6 +11,15 @@
   }
 </section>
 
+<!-- Obstacles -->
+<ng-template
+  [ngTemplateOutlet]="assetGroup"
+  [ngTemplateOutletContext]="{
+    name: 'Obstacles',
+    assets: obstacles
+  }"
+/>
+
 <!-- Enemies -->
 <ng-template
   [ngTemplateOutlet]="assetGroup"

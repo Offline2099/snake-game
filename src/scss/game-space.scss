@@ -11,10 +11,11 @@ $game-area-size-px: calc($game-block-size * $game-area-size - 1px);
       transparent 0, transparent calc($game-block-size - 1px),
       $border-normal $game-block-size
     ),
-  repeating-linear-gradient(
-    90deg,
-    transparent 0, transparent calc($game-block-size - 1px),
-    $border-normal $game-block-size
-  ),
-  radial-gradient(hsl(145, 50%, 7%), #000);
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent calc($game-block-size - 1px),
+      $border-normal $game-block-size
+    ),
+    radial-gradient(hsl(145, 50%, 7%), #000);
+  outline: 1px solid #333;
 }

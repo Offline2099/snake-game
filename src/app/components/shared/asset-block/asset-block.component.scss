@@ -16,6 +16,59 @@
   }
 }
 
+
+
+$rock-outline: 1px solid #444;
+$wall-border: 1px solid #444;
+
+$wall-scale: 0.8;
+$wall-radius: calc($game-block-size / 2);
+
+:host.rock {
+  border-radius: 2px;
+  outline: $rock-outline;
+  transform: scale(0.85);
+}
+
+:host.wall {
+  border: $wall-border;
+  overflow: hidden;
+  &.horizontal {
+    border-left: none;
+    border-right: none;
+    transform: scaleY($wall-scale);
+  }
+  &.vertical {
+    border-top: none;
+    border-bottom: none;
+    transform: scaleX($wall-scale);
+  }
+  &.end-top {
+    border-right: none;
+    border-radius: $wall-radius $wall-radius 0 0;
+    transform: scaleX($wall-scale) translateY(2px);
+  }
+  &.end-bottom {
+    border-left: none;
+    border-radius: 0 0 $wall-radius $wall-radius;
+    transform: scaleX($wall-scale) translateY(-2px);
+  }
+  &.end-left {
+    border-right: none;
+    border-radius: $wall-radius 0 0 $wall-radius;
+    transform: scaleY($wall-scale) translateX(2px);
+  }
+  &.end-right {
+    border-left: none;
+    border-radius: 0 $wall-radius $wall-radius 0;
+    transform: scaleY($wall-scale) translateX(-2px);
+  }
+}
+
+
+
+
+
 $food-normal: green;
 $food-yummy: teal;
 $food-delicious: blueviolet;
