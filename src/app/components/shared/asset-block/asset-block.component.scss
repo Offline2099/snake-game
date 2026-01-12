@@ -67,6 +67,21 @@ $wall-radius: calc($game-block-size / 2);
 
 
 
+:host.portal-entrance {
+  border-radius: 50%;
+  background-color: deepskyblue;
+  transform: scaleX(0.75) scaleY(.9);
+  opacity: .6;
+}
+
+:host.portal-exit {
+  border-radius: 50%;
+  background-color:  #ff9900;
+  transform: scaleX(0.75) scaleY(.9);
+  opacity: .7;
+}
+
+
 
 
 $food-normal: green;

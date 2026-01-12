@@ -6,6 +6,7 @@ import { BodyBlockType } from '../constants/snake/body-block-type.enum';
 // Interfaces & Types
 import { Position } from '../types/general/position.interface';
 import { Rectangle } from '../types/general/rectangle.interface';
+import { Portal } from '../types/general/portal.interface';
 import { Snake } from '../types/snake/snake.interface.ts';
 import { SnakeOptions } from '../types/snake/snake-options.interface';
 import { SnakeBlock } from '../types/snake/blocks/snake-block.interface';
@@ -100,28 +101,47 @@ export class SnakeService {
   //  Snake Flow
   //===========================================================================
 
-  moveSnake(snake: Snake): void {
-    this.moveHeadBlock(snake);
+  moveSnake(snake: Snake, portals: Portal[]): void {
+    this.moveHeadBlock(snake, portals);
     this.moveBodyBlocks(snake);
     this.moveTailBlock(snake);
+    const snakeArray: SnakeBlock[] = [snake.head, ...snake.body, snake.tail];
+    for (const [index, block] of snakeArray.entries()) {
+      if (block.teleportedBy && index !== snakeArray.length - 1) {
+        snakeArray[index + 1].teleportedBy = { ...block.teleportedBy } as Portal;
+        block.teleportedBy = undefined;
+        break;
+      }
+    }
   }
 
-  private moveHeadBlock(snake: Snake): void {
+  private moveHeadBlock(snake: Snake, portals: Portal[]): void {
     snake.head.previousPosition = { ...snake.head.currentPosition };
-    snake.head.currentPosition = 
-      this.geometry.shiftPosition(snake.head.currentPosition, snake.direction);
+    let nextPosition: Position = this.geometry.shiftPosition(snake.head.currentPosition, snake.direction);
+    const portal: Portal | undefined = 
+      portals.find(portal => this.geometry.isSamePosition(nextPosition, portal.entrance));
+    if (portal) {
+      nextPosition = this.geometry.shiftPosition(portal.exit, snake.direction);
+      snake.head.teleportedBy = portal;
+    }
+    snake.head.currentPosition = nextPosition;
     snake.head.currentDirection = snake.direction;
   }
 
   private moveBodyBlocks(snake: Snake): void {
     snake.body.forEach((block, index) => {
-      const previous: SnakeBlock = index ? snake.body[index - 1] : snake.head;
+      const previousBlock: SnakeBlock = index ? snake.body[index - 1] : snake.head;
       block.previousPosition = { ...block.currentPosition };
-      block.currentPosition = { ...previous.previousPosition };
-      block.type = this.bodyBlockType(
-        this.geometry.getDirection(block.currentPosition, previous.currentPosition),
-        this.geometry.getDirection(block.currentPosition, block.previousPosition)
-      );
+      block.currentPosition = { ...previousBlock.previousPosition };
+      const previousBlockPosition: Position = previousBlock.teleportedBy
+        ? previousBlock.teleportedBy.entrance
+        : previousBlock.currentPosition;
+      const nextBlockPosition: Position = block.teleportedBy
+        ? block.teleportedBy.exit
+        : block.previousPosition;
+      const toPrevious: Direction = this.geometry.getDirection(block.currentPosition, previousBlockPosition);
+      const toNext: Direction = this.geometry.getDirection(block.currentPosition, nextBlockPosition);
+      block.type = this.bodyBlockType(toPrevious, toNext);
     });
   }
 
@@ -130,8 +150,11 @@ export class SnakeService {
     snake.tail.previousPosition = { ...snake.tail.currentPosition };
     snake.tail.previousDirection = snake.tail.currentDirection;
     snake.tail.currentPosition = { ...lastBodyBlock.previousPosition };
+    const previousBlockPosition: Position = lastBodyBlock.teleportedBy
+      ? lastBodyBlock.teleportedBy.entrance
+      : lastBodyBlock.currentPosition;
     snake.tail.currentDirection = 
-      this.geometry.getDirection(snake.tail.currentPosition, lastBodyBlock.currentPosition);
+      this.geometry.getDirection(snake.tail.currentPosition, previousBlockPosition);
   }
 
   //===========================================================================

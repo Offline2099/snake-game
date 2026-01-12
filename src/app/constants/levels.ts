@@ -7,5 +7,6 @@ export const LEVELS: LevelBase[] = [
   { id: 4, name: 'Food Heaven' },
   { id: 5, name: 'Broken Loop' },
   { id: 6, name: 'Scattered Mess' },
-  { id: 7, name: 'The Temple' }
+  { id: 7, name: 'The Temple' },
+  { id: 8, name: 'Portal Time' }
 ];

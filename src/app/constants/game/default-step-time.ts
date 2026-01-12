@@ -1,1 +1,1 @@
-export const DEFAULT_STEP_TIME: number =  150;
+export const DEFAULT_STEP_TIME: number = 150;

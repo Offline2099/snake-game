@@ -1,5 +1,6 @@
 import { Space } from './space/space.type';
 import { GameStats } from './stats/game-stats.interface';
+import { Portal } from '../general/portal.interface';
 
 export interface Game {
   space: Space;
@@ -8,5 +9,6 @@ export interface Game {
   stepTime: number;
   progress: number;
   stats: GameStats;
-  delayedGrowth: 0;
+  portals: Portal[];
+  delayedGrowth: number;
 }

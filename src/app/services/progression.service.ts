@@ -18,7 +18,7 @@ const SETTINGS_KEY: string = 'level-settings';
 
 const DATA_URL: string = '/data';
 
-const ALWAYS_UNLOCKED_ID: number[] = [1];
+const ALWAYS_UNLOCKED_ID: number[] = [1, 2, 3, 4, 5, 6, 7, 8];
 
 @Injectable({
   providedIn: 'root'

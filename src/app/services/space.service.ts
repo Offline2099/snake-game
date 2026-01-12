@@ -4,6 +4,7 @@ import { DEFAULT_GAME_BLOCK } from '../constants/game/delault-game-block';
 import { GameBlockType } from '../constants/game/game-block-type.enum';
 import { GameBlockSubType } from '../types/game/space/game-block-subtype.type';
 import { ProtectionType } from '../constants/game/protection-type.enum';
+import { PortalType } from '../constants/portals/portal-type.enum';
 import { FoodType } from '../constants/food/food-type.enum';
 import { EnemyType } from '../constants/enemies/enemy-type.enum';
 // Interfaces & Types
@@ -110,6 +111,14 @@ export class SpaceService {
     return blockAhead.type === GameBlockType.obstacle
       || blockAhead.type === GameBlockType.snakeHead
       || blockAhead.type === GameBlockType.snakeBody;
+  }
+
+  portalAheadTo(space: Space, position: Position): Position | null {
+    if (this.isOutsideSpace(space, position)) return null;
+    const block: GameBlockData = this.getBlock(space, position);
+    return block.type === GameBlockType.portal && block.subType === PortalType.entrance
+      ? block.portalTo as Position
+      : null;
   }
 
   foodTypeAhead(space: Space, positionAhead: Position): FoodType | null {

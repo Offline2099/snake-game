@@ -4,17 +4,16 @@ import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode-id.enum';
 import { ASSET_PLACING_MODES } from '../../../constants/editor/asset-placing-modes';
 import { GameBlockType } from '../../../constants/game/game-block-type.enum';
+import { GameBlockSubType } from '../../../types/game/space/game-block-subtype.type';
 import { DEFAULT_GAME_BLOCK } from '../../../constants/game/delault-game-block';
 import { ObstacleType } from '../../../constants/obstacles/obstacle-type.enum';
-import { EnemyType } from '../../../constants/enemies/enemy-type.enum';
-import { FoodType } from '../../../constants/food/food-type.enum';
+import { PortalType } from '../../../constants/portals/portal-type.enum';
 import { ENEMY_DATA } from '../../../constants/enemies/enemy-data';
 import { FOOD_DATA } from '../../../constants/food/food-data';
 // Interfaces & Types
 import { GameBlockData } from '../../../types/game/space/game-block-data.interface';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
-import { GameBlockSubType } from '../../../types/game/space/game-block-subtype.type';
 
 @Component({
   selector: 'app-assets',
@@ -50,6 +49,16 @@ export class AssetsComponent {
 
   selectMode(modeId: AssetPlacingModeId): void {
     this.selectedModeId.set(modeId);
+  }
+
+  addPortal(): void {
+    this.selectedAsset.set({
+      type: GameBlockType.portal,
+      subType: PortalType.entrance,
+      portalTo: { x: -1, y: -1 },
+      isProtected: { ...DEFAULT_GAME_BLOCK.isProtected }
+    });
+    this.selectMode(AssetPlacingModeId.portal);
   }
 
 }

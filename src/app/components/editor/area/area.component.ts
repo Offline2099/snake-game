@@ -1,8 +1,9 @@
-import { Component, input, model } from '@angular/core';
+import { Component, model } from '@angular/core';
 import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
 import { AREA_SIZE, BLOCK_SIZE } from '../../../constants/game/game-area';
 import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode-id.enum';
+import { PortalType } from '../../../constants/portals/portal-type.enum';
 // Interfaces & Types
 import { Position } from '../../../types/general/position.interface';
 import { Rectangle } from '../../../types/general/rectangle.interface';
@@ -40,8 +41,8 @@ export class AreaComponent {
   readonly TRACKER_SHIFT = TRACKER_SHIFT;
 
   level = model.required<LevelData>();
-  selectedAsset = input.required<GameBlockData | null>();
-  selectedModeId = input.required<AssetPlacingModeId>();
+  selectedAsset = model.required<GameBlockData | null>();
+  selectedModeId = model.required<AssetPlacingModeId>();
 
   mousePx: Position = DEFAULT_POSITION;
   mousePosition: Position = DEFAULT_POSITION;
@@ -49,6 +50,8 @@ export class AreaComponent {
   isFillActive: boolean = false;
   areaStart: Position = DEFAULT_POSITION;
   temporaryArray: EntityData[] = [];
+
+  portalEntrance: Position | null = null;
 
   constructor(private geometry: GeometryService) {}
 
@@ -97,6 +100,28 @@ export class AreaComponent {
         }
         this.areaStart = this.isFillActive ? this.mousePosition : DEFAULT_POSITION;
         break;
+      case AssetPlacingModeId.portal:
+        this.addEntity(this.level().entities, this.mousePosition, this.selectedAsset()!);
+        switch (this.selectedAsset()?.subType) {
+          case PortalType.entrance:
+            this.portalEntrance = { ...this.mousePosition  };
+            this.selectedAsset.update(value => ({
+              ...value,
+              subType: PortalType.exit,
+              portalTo: undefined
+            }) as GameBlockData);
+            break;
+          case PortalType.exit:
+            if (!this.portalEntrance) break;
+            const update: Partial<GameBlockData> = {
+              portalTo: { ...this.mousePosition }
+            }
+            this.updateEntity(this.level().entities, this.portalEntrance, update);
+            this.selectedAsset.set(null);
+            this.selectedModeId.set(AssetPlacingModeId.single);        
+            break;
+        }
+        break;
     }
   }
 
@@ -113,6 +138,10 @@ export class AreaComponent {
           this.temporaryArray = [];
         }
         break;
+      case AssetPlacingModeId.portal:
+        this.selectedAsset.set(null);
+        this.selectedModeId.set(AssetPlacingModeId.single);
+        break;
     }
   }
 
@@ -125,6 +154,15 @@ export class AreaComponent {
     for (const [index, entity] of array.entries()) {
       if (this.geometry.isSamePosition(position, entity.position)) {
         array.splice(index, 1);
+        break;
+      }
+    }
+  }
+
+  updateEntity(array: EntityData[], position: Position, update: Partial<GameBlockData>): void {
+    for (const entity of array) {
+      if (this.geometry.isSamePosition(position, entity.position)) {
+        entity.block = { ...entity.block, ...update };
         break;
       }
     }

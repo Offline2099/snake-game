@@ -1,6 +1,7 @@
 import { Direction } from '../general/direction.enum';
 import { GameBlockType } from './game-block-type.enum';
 import { ObstacleType } from '../obstacles/obstacle-type.enum';
+import { PortalType } from '../portals/portal-type.enum';
 import { EnemyType } from '../enemies/enemy-type.enum';
 import { FoodType } from '../food/food-type.enum';
 import { BodyBlockType } from '../snake/body-block-type.enum';
@@ -15,10 +16,10 @@ export const BLOCK_CLASS: Record<number, Record<number, string>> = {
     [ObstacleType.wallEndLeft]: 'wall end-left',
     [ObstacleType.wallEndRight]: 'wall end-right'
   },
-  // [GameBlockType.portal]: {
-  //   [PortalType.entrance]: 'portal-entrance',
-  //   [PortalType.exit]: 'portal-exit'
-  // },
+  [GameBlockType.portal]: {
+    [PortalType.entrance]: 'portal-entrance',
+    [PortalType.exit]: 'portal-exit'
+  },
   [GameBlockType.snakeHead]: {
     [Direction.up]: 'snake-block head up',
     [Direction.down]: 'snake-block head down',

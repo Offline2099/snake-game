@@ -9,10 +9,16 @@
 <div class="wrapper">
 
   <!-- Game Level Area -->
-   <app-area [(level)]="level" [selectedAsset]="selectedAsset" [selectedModeId]="selectedModeId" />
+  <app-area
+    [(level)]="level"
+    [(selectedAsset)]="selectedAsset"
+    [(selectedModeId)]="selectedModeId"
+  />
 
-  <!-- Tabs -->
+  <!-- Tab Container -->
   <div class="tabs">
+
+    <!-- Mode Selection -->
     <div class="wrapper">
       @for (tab of EDITOR_TABS; track tab.id) {
         <button
@@ -23,6 +29,8 @@
         </button>
       }
     </div>
+
+    <!-- Tabs -->
     @switch (selectedTabId) {
       @case (EditorTabId.assets) {
         <app-assets [(selectedAsset)]="selectedAsset" [(selectedModeId)]="selectedModeId" />
@@ -31,6 +39,7 @@
         <app-properties [(level)]="level" />
       }
     }
+
   </div>
   
 </div>
