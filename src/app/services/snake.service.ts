@@ -106,11 +106,11 @@ export class SnakeService {
     this.moveBodyBlocks(snake);
     this.moveTailBlock(snake);
     const snakeArray: SnakeBlock[] = [snake.head, ...snake.body, snake.tail];
-    for (const [index, block] of snakeArray.entries()) {
-      if (block.teleportedBy && index !== snakeArray.length - 1) {
-        snakeArray[index + 1].teleportedBy = { ...block.teleportedBy } as Portal;
-        block.teleportedBy = undefined;
-        break;
+    for (let i = 0; i < snakeArray.length; i ++) {
+      if (snakeArray[i].teleportedBy && i !== snakeArray.length - 1) {
+        snakeArray[i + 1].teleportedBy = { ...snakeArray[i].teleportedBy } as Portal;
+        snakeArray[i].teleportedBy = undefined;
+        i++;
       }
     }
   }

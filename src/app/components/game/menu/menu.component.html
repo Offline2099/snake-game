@@ -13,7 +13,7 @@
         }        
       }
 
-      <div>Level {{ $index + 1 }}</div>
+      <div>Level {{ level().id }}</div>
       <div class="level-name">{{ level().name }}</div>
 
       @if (!level().progression.isLocked) {

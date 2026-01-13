@@ -173,10 +173,10 @@ export class GameService {
   }
 
   private removeEntity(game: Game, level: Level, position: Position, blockType: GameBlockType): void {
-    this.setFreeBlock(game.space, level, position);
+    this.setFreeBlock(game, level, position);
     this.protectionTypes().forEach(protectionType => {
       const margin: number = level.settings.protectedMargins[blockType]![protectionType];
-      this.unprotectMargin(game.space, level, position, margin);
+      this.unprotectMargin(game, level, position, margin);
     });
   }
 
@@ -188,38 +188,38 @@ export class GameService {
     this.spaceService.setAreaProtectionState(space, area, type, true);
   }
 
-  private unprotectArea(space: Space, level: Level, area: Rectangle): void {
-    this.unprotectPositions(space, level, this.geometry.positionsWithinArea(area));
+  private unprotectArea(game: Game, level: Level, area: Rectangle): void {
+    this.unprotectPositions(game, level, this.geometry.positionsWithinArea(area));
   }
 
-  private unprotectMargin(space: Space, level: Level, center: Position, margin: number): void {
-    this.unprotectPositions(space, level, this.geometry.positionsWithinMargin(center, margin));
+  private unprotectMargin(game: Game, level: Level, center: Position, margin: number): void {
+    this.unprotectPositions(game, level, this.geometry.positionsWithinMargin(center, margin));
   }
 
-  private unprotectPositions(space: Space, level: Level, positions: Position[]): void {
+  private unprotectPositions(game: Game, level: Level, positions: Position[]): void {
     positions.forEach(position => {
-      if (!this.spaceService.isOfType(space, position, GameBlockType.free)) return;
-      this.setFreeBlock(space, level, position);
+      if (!this.spaceService.isOfType(game.space, position, GameBlockType.free)) return;
+      this.setFreeBlock(game, level, position);
     });
   }
 
-  private setFreeBlock(space: Space, level: Level, position: Position): void {
-    for (let entity of level.settings.entities) {
-      if (!this.geometry.isSamePosition(position, entity.position)) continue;
-      if (entity.block.subType !== PortalType.exit) continue;
-      this.spaceService.setBlock(space, position, entity.block);
+  private setFreeBlock(game: Game, level: Level, position: Position): void {
+    for (let portal of game.portals) {
+      if (!this.geometry.isSamePosition(position, portal.exit)) continue;
+      const block: GameBlockData = this.spaceService.createBlock(GameBlockType.portal, PortalType.exit);
+      this.spaceService.setBlock(game.space, position, block);
       return;
     }
     const protection: Protection = this.spaceService.defaultBlock().isProtected;
     this.protectionTypes().forEach(protectionType => {
       const perimeterMargin: number = level.settings.perimeterProtection[protectionType];
-      if (this.geometry.isNearPerimeter(this.spaceService.toRectangle(space), position, perimeterMargin)) {
+      if (this.geometry.isNearPerimeter(this.spaceService.toRectangle(game.space), position, perimeterMargin)) {
         protection[protectionType] = true;
         return;
       }
       [GameBlockType.obstacle, GameBlockType.portal, GameBlockType.enemy, GameBlockType.food].forEach(blockType => {
         const margin: number = level.settings.protectedMargins[blockType]![protectionType];
-        if (this.spaceService.isBlockNearby(space, position, blockType, margin)) {
+        if (this.spaceService.isBlockNearby(game.space, position, blockType, margin)) {
           protection[protectionType] = true;
         }
       });
@@ -228,7 +228,7 @@ export class GameService {
       ...this.spaceService.defaultBlock(),
       isProtected: { ...protection }
     }
-    this.spaceService.setBlock(space, position, block);
+    this.spaceService.setBlock(game.space, position, block);
   }
 
   //===========================================================================
@@ -305,7 +305,7 @@ export class GameService {
     game.stats.totalDamageTaken += damage;
     const amount: number = level.settings.enemies[enemyType][EntityParameterId.spawnOnInteraction];
     this.spawnEnemies(game, level, enemyType, amount);
-    this.reduceSnake(game.space, level, snake, damage);
+    this.reduceSnake(game, level, snake, damage);
     this.updateGameProgress(game, level, -damage);
     if (damage >= lengthBeforeDamage) {
       game.isDefeat = true;
@@ -386,26 +386,26 @@ export class GameService {
   private moveSnake(game: Game, level: Level, snake: Snake): void {
     if (snake.direction !== snake.head.currentDirection) {
       const path: Rectangle = this.snakeService.snakePathAhead(snake, SNAKE_PROTECTION.pathLength);
-      this.unprotectArea(game.space, level, path);
+      this.unprotectArea(game, level, path);
     }
-    this.unprotectMargin(game.space, level, snake.tail.currentPosition, SNAKE_PROTECTION.pathLength);
+    this.unprotectMargin(game, level, snake.tail.currentPosition, SNAKE_PROTECTION.pathLength);
     this.snakeService.moveSnake(snake, game.portals);
-    this.setFreeBlock(game.space, level, snake.tail.previousPosition);
+    this.setFreeBlock(game, level, snake.tail.previousPosition);
     this.setSnake(game.space, snake);
   }
 
-  private reduceSnake(space: Space, level: Level, snake: Snake, amount: number): void {
+  private reduceSnake(game: Game, level: Level, snake: Snake, amount: number): void {
     const positionsToCut: Position[] = [
       ...snake.body.slice(Math.max(snake.body.length - 1 - amount, 1))
         .map(block => block.currentPosition),
       snake.tail.currentPosition
     ];
     positionsToCut.forEach(position => {
-      this.setFreeBlock(space, level, position);
-      this.unprotectMargin(space, level, position, SNAKE_PROTECTION.margin);
+      this.setFreeBlock(game, level, position);
+      this.unprotectMargin(game, level, position, SNAKE_PROTECTION.margin);
     });
     this.snakeService.takeDamage(snake, amount);
-    this.setSnake(space, snake);
+    this.setSnake(game.space, snake);
   }
 
 }
