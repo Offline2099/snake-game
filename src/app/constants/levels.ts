@@ -15,10 +15,10 @@ export const LEVELS: LevelBase[] = [
   { id: 12, name: 'Tricky Corners' },
   { id: 13, name: 'Ouroboros' },
   { id: 14, name: 'Choices' },
-  { id: 15, name: '???' },
+  { id: 15, name: 'Memory Test' },
   { id: 16, name: 'Order and Chaos' },
   { id: 17, name: 'Prison Cells' },
   { id: 18, name: 'Twisted Confusion' },
-  { id: 19, name: 'Apple Harvest' },
-  { id: 20, name: 'The Catacombs' }
+  { id: 19, name: 'The Catacombs' },
+  { id: 20, name: 'Apple Harvest' }
 ];
