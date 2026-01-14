@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 // Constants & Enums
 import { DEFAULT_GAME_BLOCK } from '../constants/game/delault-game-block';
 import { GameBlockType } from '../constants/game/game-block-type.enum';
-import { GameBlockSubType } from '../types/game/space/game-block-subtype.type';
 import { ProtectionType } from '../constants/game/protection-type.enum';
 import { PortalType } from '../constants/portals/portal-type.enum';
 import { FoodType } from '../constants/food/food-type.enum';
@@ -13,8 +12,9 @@ import { Rectangle } from '../types/general/rectangle.interface';
 import { GameBlockData } from '../types/game/space/game-block-data.interface';
 import { Space } from '../types/game/space/space.type';
 import { Protection } from '../types/game/space/protection.type';
+import { GameBlockSubType } from '../types/game/space/game-block-subtype.type';
 // Services
-import { GeometryService } from './geometry.service';
+import { GeometryService } from './general/geometry.service';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +46,17 @@ export class SpaceService {
       type,
       subType,
       isProtected: protection ? { ...protection } : { ...DEFAULT_GAME_BLOCK.isProtected }
+    }
+  }
+
+  createPortalBlock(portalType: PortalType): GameBlockData {
+    return {
+      type: GameBlockType.portal,
+      subType: portalType,
+      isProtected: {
+        [ProtectionType.noEnemySpawn]: true,
+        [ProtectionType.noFoodSpawn]: true
+      }
     }
   }
 
@@ -111,14 +122,6 @@ export class SpaceService {
     return blockAhead.type === GameBlockType.obstacle
       || blockAhead.type === GameBlockType.snakeHead
       || blockAhead.type === GameBlockType.snakeBody;
-  }
-
-  portalAheadTo(space: Space, position: Position): Position | null {
-    if (this.isOutsideSpace(space, position)) return null;
-    const block: GameBlockData = this.getBlock(space, position);
-    return block.type === GameBlockType.portal && block.subType === PortalType.entrance
-      ? block.portalTo as Position
-      : null;
   }
 
   foodTypeAhead(space: Space, positionAhead: Position): FoodType | null {

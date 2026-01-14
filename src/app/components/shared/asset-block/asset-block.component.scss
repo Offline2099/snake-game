@@ -234,17 +234,17 @@ $snake-success-color: green;
 
 
 // Temporarty for debugging
-:host {
-  &.no-enemies {
-    opacity: .2;
-    background-color: yellow;
-  }
-  &.no-food {
-    opacity: .2;
-    background-color: blue;
-  }
-  &.all {
-    opacity: .2;
-    background-color: red;
-  }
-}
+// :host {
+//   &.no-enemies {
+//     opacity: .2;
+//     background-color: yellow;
+//   }
+//   &.no-food {
+//     opacity: .2;
+//     background-color: blue;
+//   }
+//   &.all {
+//     opacity: .2;
+//     background-color: red;
+//   }
+// }

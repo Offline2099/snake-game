@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, ElementRef, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 // Constants & Enums
 import { EditorTabId } from '../../../constants/editor/editor-tab-id.enum';
@@ -15,7 +15,7 @@ import { AreaComponent } from '../area/area.component';
 import { AssetsComponent } from '../assets/assets.component';
 import { PropertiesComponent } from '../properties/properties.component';
 // Services
-import { FileService } from '../../../services/file.service';
+import { FileService } from '../../../services/general/file.service';
 
 @Component({
   selector: 'app-editor',
@@ -34,21 +34,21 @@ export class EditorComponent {
   selectedAsset: GameBlockData | null = null;
   selectedModeId: AssetPlacingModeId = AssetPlacingModeId.single;
 
-  constructor(private file: FileService) {}
+  constructor(private container: ElementRef, private fileService: FileService) {}
 
   loadJSON(): void {
-    this.file.useFileInputById(EditorInputId.file);
+    this.fileService.useFileInputById(EditorInputId.file);
   }
 
   onFileChange(event: Event) {
-    this.file.readUserJSON<LevelData>(this.level(), event, (updatedLevel) => {
+    this.fileService.readUserJSON<LevelData>(this.level(), event, (updatedLevel) => {
       this.level.set({ ...updatedLevel });
     });
   }
 
   saveJSON(): void {
     const fileName: string = `level-${this.level().id}`;
-    this.file.downloadAsJSON<LevelData>(this.level(), fileName);
+    this.fileService.downloadAsJSON<LevelData>(this.level(), fileName, this.container.nativeElement);
   }
 
   selectTab(tab: EditorTab): void {

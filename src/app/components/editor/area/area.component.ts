@@ -13,7 +13,7 @@ import { GameBlockData } from '../../../types/game/space/game-block-data.interfa
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
 // Services
-import { GeometryService } from '../../../services/geometry.service';
+import { GeometryService } from '../../../services/general/geometry.service';
 
 enum RulerOrientation {
   horizontal,

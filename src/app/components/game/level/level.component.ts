@@ -11,7 +11,7 @@ import { GameAreaComponent } from '../game-area/game-area.component';
 import { GameInstructionsComponent } from '../game-instructions/game-instructions.component';
 import { GameControlsComponent } from '../game-controls/game-controls.component';
 // Services
-import { GameService } from '../../../services/game.service';
+import { GameService } from '../../../services/game/game.service';
 import { SnakeService } from '../../../services/snake.service';
 import { ProgressionService } from '../../../services/progression.service';
 
@@ -39,7 +39,7 @@ export class LevelComponent {
       this.startTimer();
       return;
     }
-    if (this.timer) this.gameService.changeSnakeDirectionByKey(this.game, this.snake, key);
+    if (this.timer) this.gameService.changeSnakeDirection(this.game, this.snake, key);
   }
 
   level = input.required<Level>();

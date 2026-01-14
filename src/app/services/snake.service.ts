@@ -14,7 +14,7 @@ import { HeadBlock } from '../types/snake/blocks/head-block.interface';
 import { BodyBlock } from '../types/snake/blocks/body-block.interface';
 import { TailBlock } from '../types/snake/blocks/tail-block.interface';
 // Services
-import { GeometryService } from './geometry.service';
+import { GeometryService } from './general/geometry.service';
 
 @Injectable({
   providedIn: 'root'
@@ -77,12 +77,16 @@ export class SnakeService {
   //  Snake Utility
   //===========================================================================
 
+  allBlocks(snake: Snake): SnakeBlock[] {
+    return [snake.head, ...snake.body, snake.tail];
+  }
+
   snakePathAhead(snake: Snake, pathLength: number): Rectangle {
     return this.geometry.rectangleFromTwoPoints(
       this.geometry.shiftPosition(snake.head.currentPosition, snake.head.currentDirection),
       this.geometry.shiftPosition(snake.head.currentPosition, snake.head.currentDirection, pathLength)
     );
-  }
+  } 
 
   private bodyBlockType(toPrevious: Direction, toNext: Direction): BodyBlockType {
     const toAdjacent: Direction[] = [toPrevious, toNext];
@@ -105,7 +109,7 @@ export class SnakeService {
     this.moveHeadBlock(snake, portals);
     this.moveBodyBlocks(snake);
     this.moveTailBlock(snake);
-    const snakeArray: SnakeBlock[] = [snake.head, ...snake.body, snake.tail];
+    const snakeArray: SnakeBlock[] = this.allBlocks(snake);
     for (let i = 0; i < snakeArray.length; i ++) {
       if (snakeArray[i].teleportedBy && i !== snakeArray.length - 1) {
         snakeArray[i + 1].teleportedBy = { ...snakeArray[i].teleportedBy } as Portal;
