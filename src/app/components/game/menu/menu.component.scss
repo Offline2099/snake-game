@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../../scss' as *;
 
 :host {
@@ -7,10 +8,16 @@
 .wrapper {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  width: 1200px;
+  width: $content-width;
   margin: 50px auto;
   gap: 10px;
 }
+
+$bg-unlocked: #223322;
+$bg-locked: #332222;
+
+$c1: color.adjust($bg-unlocked, $lightness: -0.5%);
+$c2: color.adjust($bg-unlocked, $lightness: 1.75%);
 
 .level-block {
   display: flex;
@@ -18,34 +25,45 @@
   justify-content: center;
   align-items: center;
   height: 200px;
+  border: 3px solid color.adjust($bg-unlocked, $lightness: 3%);
   border-radius: 10px;
-  background: #223322;
+  background: repeating-linear-gradient(-45deg, $c1 0, $c1 10px, $c2 11px, $c2 20px);
+  text-shadow: 1px 1px #222;
+  letter-spacing: .05em;
   transition: .2s;
   cursor: pointer;
   &.locked {
     pointer-events: none;
-    background: #332222;
+    background: $bg-locked;
+    border-color: color.adjust($bg-locked, $lightness: 3%);
   }
   @include hover {
     filter: brightness(1.1);
   }
 }
 
-.block-icon {
-  width: 40px;
+.upper-block {
   height: 40px;
   margin-bottom: 20px;
-  &.lock {
-    filter: brightness(.7);
+  .block-icon {
+    width: 40px;
+    height: 40px;
+    &.lock {
+      filter: brightness(.7);
+    }
   }
 }
 
-.level-name {
-  font-size: 20px;
-  letter-spacing: .05em;
+.middle-block {
+  height: 48px;
+  text-align: center;
+  .level-name {
+    font-size: 20px;
+  }
 }
 
-.progress-record {
-  margin-top: 20px;
-  color: #999;
+.bottom-block {
+  height: 20px;
+  margin-top: 10px;
+  color: $text-darker;
 }

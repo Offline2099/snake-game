@@ -1,11 +1,16 @@
-$text-normal: #aaa;
+// Text
+$text-normal: #bbb;
+$text-darker: #999;
 $text-selected: green;
 
+// Backgrounds
 $bg-base: #111;
 $bg-area: #181818;
 $bg-button: #282828;
 $bg-button-hovered: #333;
 $bg-input: #222;
 
+// Borders
 $border-normal: #444;
-$border-dim: #222;
+$border-dim: #333;
+$border-dark: #222;

@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../../scss' as *;
 
 :host {
@@ -10,12 +11,14 @@ h2 {
   font-size: 28px;
   font-weight: 500;
   letter-spacing: .02em;
+  text-shadow: 2px 2px #222;
 }
 
-.wrapper {
+main {
   display: flex;
   flex-shrink: 1;
-  margin: 0 auto;
+  width: $content-width;
+  margin: 0 auto 50px auto;
   gap: 10px;
 }
 
@@ -27,6 +30,11 @@ h2 {
 }
 
 .side-column {
-  width: 250px;
-  padding: 10px;
+  width: 250px;  
+  & > * {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: color.adjust(black, $alpha: -0.75);
+  }
+  
 }

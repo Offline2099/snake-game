@@ -1,9 +1,9 @@
 <!-- Level Header -->
-<div>
+<header>
   <h2>Level {{ level().id }}: {{ level().name }}</h2>
-</div>
+</header>
 
-<div class="wrapper">
+<main>
 
   <!-- Left Column -->
   <div class="side-column">
@@ -12,7 +12,11 @@
 
   <!-- Central Column -->
   <div class="main-column">
-    <app-game-progress [progress]="game.progress" [goal]="level().settings.goal" />
+    <app-game-progress
+      [progress]="game.progress"
+      [goal]="level().settings.goal"
+      [isActive]="timer !== null || game.isDefeat || game.isVictory" 
+    />
     <app-game-area [game]="game" />
   </div>
 
@@ -21,6 +25,8 @@
     <app-game-instructions [level]="level()" />
     <app-game-controls 
       [game]="game"
+      [level]="level()"
+      [isLastLevel]="nextLevelId() === null"
       (start)="startTimer()"
       (pause)="stopTimer()"
       (reset)="resetGame()"
@@ -28,4 +34,4 @@
     />
   </div>
 
-</div>
+</main>

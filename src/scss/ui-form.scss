@@ -1,13 +1,5 @@
 @use './base' as *;
 
-h3 {
-  margin-top: 5px;
-  padding: 0 5px;
-  font-size: 18px;
-  font-weight: 400;
-  border-bottom: 1px solid $border-normal;
-}
-
 section {
   display: flex;
   align-items: center;

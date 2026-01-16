@@ -18,7 +18,8 @@
 
 
 
-$rock-outline: 1px solid #444;
+//$rock-outline: 1px solid #444;
+$rock-outline: 1px solid #333;
 $wall-border: 1px solid #444;
 
 $wall-scale: 0.8;
@@ -28,10 +29,17 @@ $wall-radius: calc($game-block-size / 2);
   border-radius: 2px;
   outline: $rock-outline;
   transform: scale(0.85);
+  background: 
+    repeating-linear-gradient(45deg, transparent 0, transparent 5px, #383838 6px, transparent 7px, transparent 9px, #383838 10px),
+    repeating-linear-gradient(-45deg, #242424 0, #242424 5px, #383838 6px, #242424 7px, #242424 10px, #383838 11px);
 }
 
 :host.wall {
-  border: $wall-border;
+  background: 
+    repeating-linear-gradient(45deg, transparent 0, transparent 5px, #383838 6px, transparent 7px, transparent 9px, #383838 10px),
+    repeating-linear-gradient(-45deg, #242424 0, #242424 5px, #383838 6px, #242424 7px, #242424 10px, #383838 11px);
+
+  //border: $wall-border;
   overflow: hidden;
   &.horizontal {
     border-left: none;
@@ -159,11 +167,13 @@ $food-delicious: blueviolet;
   }
 }
 
-$snake-color: #007777;
-$snake-eyes-color: #00cc88;
+//$snake-color: #007777;
+$snake-color: #006666;
+//$snake-eyes-color: #00cc88;
+$snake-eyes-color: #00aaaa;
 
 $snake-dead-color: maroon;
-$snake-success-color: green;
+$snake-success-color: darkgreen;
 
 @mixin snake-color($color) {
   box-shadow: 
@@ -179,6 +189,7 @@ $snake-success-color: green;
   height: $game-block-size;  
   @include snake-color($snake-color);
   &.head {
+    //clip-path: path("M10,0 C15,0 20,10 20,15 C20,20 10,20 10,20 C10,20 0,20 0,15 C0,10 5,0 10,0 Z");
     clip-path: inset(2px 0 2px 0 round 0 10px 10px 0);
     @include rotate-to-direction;
     &:before,
@@ -212,7 +223,6 @@ $snake-success-color: green;
   &.round-top-right,
   &.round-bottom-left,
   &.round-bottom-right {
-    //clip-path: path('M 0 1 A 1 1 0 0 0 1 0 L 15 0 L 15 7.5 C 15 11.75 11.75 15 7.5 15 L 0 15 Z');
     clip-path: path('M 0 2 A 2 2 0 0 0 2 0 L 19 0 L 19 10 C 19 15 15 19 10 19 L 0 19 Z');
   }
   &.round-top-left {

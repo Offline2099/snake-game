@@ -1,14 +1,41 @@
-<div class="default-controls">
-  <button type="button" (click)="startGame()">Start</button>
-  <button type="button" (click)="showMenu()">Menu</button>
-</div>
+@if (!game().isDefeat && !game().isVictory) {
+  <div class="default-buttons">
+    <button
+      type="button"
+      class="start"
+      [ngClass]="{ 'disabled': game().stats.stepsDone > 0 }"
+      (click)="startGame()">
+      <img src="images/buttons/start.svg" alt="" />
+      <ng-container>Start</ng-container>
+    </button>
+    <button type="button" (click)="showMenu()">
+      <img src="images/buttons/menu.svg" alt="" />
+      <ng-container>Menu</ng-container>
+    </button>
+  </div>
+}
 
 @if (game().isDefeat) {
-  <div class="controls-overlay fail">
+  <div class="controls-overlay defeat">
     <div class="overlay-header">YOU DIED</div>
+    @if (isNewBestAttempt()) {
+      <div class="section-line">
+        <ng-container>New best attempt: </ng-container>
+        <ng-container>{{ game().progress }}</ng-container>
+        <ng-container>&hairsp;/&hairsp;</ng-container>
+        <ng-container>{{ level().settings.goal }}</ng-container>
+      </div>
+    }
     <div class="overlay-buttons">
-      <button type="button" (click)="resetGame()">Try Again</button>
-      <button type="button" (click)="showMenu()">Menu</button>
+      <button type="button" (click)="resetGame()">
+        <img src="images/buttons/replay.svg" alt="" />
+        <ng-container>Try Again</ng-container>
+      </button>
+      <button type="button" (click)="showMenu()">
+        <img src="images/buttons/menu.svg" alt="" />
+        <ng-container>Menu</ng-container>
+      </button>
+
     </div>
   </div>
 }
@@ -16,9 +43,28 @@
 @if (game().isVictory) {
   <div class="controls-overlay victory">
     <div class="overlay-header">VICTORY</div>
+    @if (isNewBestTime()) {
+      <div class="section-line">
+        <ng-container>New best time: </ng-container>
+        <ng-container>{{ game().stats.elapsedTime | secondsAsTime }}</ng-container>
+      </div>
+    }
     <div class="overlay-buttons">
-      <button type="button" (click)="resetGame()">Play Again</button>
-      <button type="button" (click)="showMenu()">Continue</button>
+      <button type="button" (click)="resetGame()">
+        <img src="images/buttons/replay.svg" alt="" />
+        <ng-container>Play Again</ng-container>
+      </button>
+      @if (isLastLevel()) {
+        <button type="button" (click)="showMenu()">
+          <img src="images/buttons/menu.svg" alt="" />
+          <ng-container>Menu</ng-container>
+        </button>
+      } @else {
+        <button type="button" (click)="showMenu()">
+          <img src="images/buttons/start.svg" alt="" />
+          <ng-container>Next</ng-container>
+        </button>
+      }
     </div>
   </div>
 }

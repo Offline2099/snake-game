@@ -7,15 +7,40 @@
   margin-top: 8px;
   justify-content: center;
   align-items: center;
-  & button {
-    padding: 5px 10px;
-    border-radius: 5px;
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  border-color: $border-dim;
+  border-radius: 5px;
+  font-size: 18px;
+  animation: fade-in .2s;
+  &.start {
+    background: #223322;
+    border-color: #334433;
+    @include hover {
+      filter: brightness(1.2)
+    }
+  }
+  img {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
   }
 }
 
-.default-controls {
+.default-buttons {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  button {
+    width: 50%;
+  }
 }
 
 .controls-overlay {
@@ -30,20 +55,29 @@
   align-items: center;
   gap: 10px;
   border-radius: 5px;
-  background-color: $bg-base;
   animation: grow .2s;
 }
 
 .overlay-header {
   width: 80%;
+  margin-bottom: 10px;
   padding-bottom: 2px;
-  border-bottom: 1px solid;
+  border-bottom: 1px solid $border-dim;
   font-size: 20px;
+  font-weight: 500;
   text-align: center;
+  .victory & {
+    color: green;
+  }
+  .defeat & {
+    color: darkred;
+  }
 }
 
 .overlay-buttons {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   gap: 10px;
+  margin-top: 10px;
 }

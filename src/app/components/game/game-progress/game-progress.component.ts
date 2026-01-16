@@ -11,6 +11,7 @@ export class GameProgressComponent {
 
   progress = input.required<number>();
   goal = input.required<number>();
+  isActive = input.required<boolean>();
 
   percentage = computed(() => Math.floor(100 * this.progress() / this.goal()));
 

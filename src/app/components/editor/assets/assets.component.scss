@@ -4,6 +4,14 @@
   @include tab;
 }
 
+h3 {
+  margin-top: 5px;
+  padding: 0 5px;
+  font-size: 18px;
+  font-weight: 400;
+  border-bottom: 1px solid $border-normal;
+}
+
 section {
   margin: 10px 0;
   gap: 6px;

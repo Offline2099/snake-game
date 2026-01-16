@@ -1,1 +1,10 @@
 @use '../../../../scss' as *;
+
+:host {
+  height: 100%;
+}
+
+th, td {
+  font-size: 14px;
+  text-align: right;
+}

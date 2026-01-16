@@ -32,9 +32,10 @@ export class GameStatsComponent {
   snake = input.required<Snake>();
 
   levelHasEnemies = computed<boolean>(() => 
-    this.enemyTypes
-      .map(enemyType => this.level().settings.enemies[enemyType][EntityParameterId.initialAmount])
-      .some(amount => amount > 0)
+    Object.values(this.game().stats.enemies).reduce((acc, data) => {
+      acc += data.present + data.hit;
+      return acc;
+    }, 0) > 0
   );
 
   foodTypes: FoodType[];
