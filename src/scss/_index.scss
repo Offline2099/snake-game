@@ -1,7 +1,4 @@
 @forward './base';
-@forward 'page';
-@forward 'game-space';
-@forward 'game-side-column';
-@forward 'ui-area';
-@forward 'ui-button';
-@forward 'ui-form';
+@forward './editor';
+@forward './game';
+@forward './shared';

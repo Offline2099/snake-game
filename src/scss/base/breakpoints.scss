@@ -1,0 +1,13 @@
+// HD or 1080p (1920x1080)
+@mixin hd {
+  @media (max-width: 1920px) {
+    @content;
+  }
+}
+
+// Max 16:9 resolution to fit level vertically without shrinking (1408x792)
+@mixin small-screen {
+  @media (max-width: 1408px) {
+    @content;
+  }
+}

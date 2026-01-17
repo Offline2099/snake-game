@@ -1,0 +1,23 @@
+@use '../base' as *;
+
+@mixin ui-block {
+  display: flex;
+  flex-direction: column;
+  background: $bg-area;
+  border: 2px solid $border-dim;
+  border-radius: 5px;
+  h3 {
+    margin-top: 5px;
+    padding: 0 5px;
+    font-size: 18px;
+    font-weight: 400;
+    border-bottom: 1px solid $border-normal;
+  }
+}
+
+@mixin tab {
+  flex-grow: 1;
+  width: 300px;
+  padding: 10px 5px;
+  @include ui-block;
+}

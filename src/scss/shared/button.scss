@@ -1,0 +1,27 @@
+@use '../base' as *;
+
+button {
+  border: 1px solid $border-normal;
+  border-radius: 4px;
+  background-color: $bg-button;
+  color: $text-normal;
+  letter-spacing: .05em;
+  transition: .2s;
+  cursor: pointer;
+  @include hover {
+    background-color: $bg-button-hovered;
+  }
+  &.disabled {
+    opacity: .5;
+    pointer-events: none;
+  }
+  &.editor-button {
+    padding: 3px 5px;
+    font-size: 15px;
+    &.selected {
+      color: $text-selected;
+      border-color: $border-selected;
+      pointer-events: none;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+<div class="game-space">
+  @for (column of game().space; track $index; let x = $index) {
+    @for (block of column; track $index; let y = $index) {
+      @if (block.type !== GameBlockType.free) {
+        <app-asset-block 
+          class="game-block"
+          [type]="block.type"
+          [subType]="block.subType"
+          [ngStyle]="{
+            'left.px': BLOCK_SIZE * x,
+            'bottom.px': BLOCK_SIZE * y
+          }"
+          [ngClass]="{
+            'fail': game().isDefeat,
+            'success': game().isVictory
+          }"
+        />
+      }
+    }
+  }
+</div>

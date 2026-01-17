@@ -1,0 +1,141 @@
+<!-- Tab Headers -->
+<div class="tab-headers">
+  @for (tab of PROPERTY_TABS; track $index) {
+    <button
+      type="button"
+      class="editor-button"
+      [ngClass]="{ 'selected': selectedTabId === tab.id }"
+      (click)="selectTab(tab)">
+      {{ tab.name }}
+    </button>
+  }
+</div>
+
+<!-- Tabs -->
+@switch (selectedTabId) {
+
+  <!-- Main -->
+  @case (PropertyTabId.main) {
+    <ng-template
+      [ngTemplateOutlet]="textInput"
+      [ngTemplateOutletContext]="{
+        id: EditorInputId.levelId,
+        label: 'Id',
+        field: form.id,
+        output: [EditorInputId.levelId]
+      }"
+    />
+    <section  class="column">
+      <label [for]="EditorInputId.levelInstructions">Instructions: </label>
+      <textarea
+        [id]="EditorInputId.levelInstructions"
+        rows="20"
+        [field]="form.instructions"
+        (change)="onChange(EditorInputId.levelInstructions)">
+      </textarea>
+    </section>
+  }
+
+  <!-- Obstacles -->
+  @case (PropertyTabId.obstacles) {
+    <h3>Protected perimeter</h3>
+    @for (type of protectedMarginTypes; track $index) {
+      <ng-template
+        [ngTemplateOutlet]="textInput"
+        [ngTemplateOutletContext]="{
+          id: EditorInputId.perimeterMargin + type,
+          label: MARGIN_TYPE[type],
+          field: form.perimeterMargin[type],
+          output: [EditorInputId.perimeterMargin, type]
+        }"
+      />
+    }
+    @for (blockType of gameBlockTypes(); track $index) {
+      <h3>{{ BLOCK_TYPE[blockType] }}</h3>
+      @for (marginType of protectedMarginTypes; track $index) {
+        <ng-template
+          [ngTemplateOutlet]="textInput"
+          [ngTemplateOutletContext]="{
+            id: EditorInputId.protectedMargin + blockType + '-' + marginType,
+            label: MARGIN_TYPE[marginType],
+            field: form.protectedMargins[blockType]![marginType],
+            output: [EditorInputId.protectedMargin, blockType, marginType]
+          }"
+        />
+      }
+    }
+  }
+
+  <!-- Food -->
+  @case (PropertyTabId.food) {
+    <ng-template
+      [ngTemplateOutlet]="textInput"
+      [ngTemplateOutletContext]="{
+        id: EditorInputId.goal,
+        label: 'Progress goal',
+        field: form.goal,
+        output: [EditorInputId.goal]
+      }"
+    />
+    @for (type of foodTypes(); track $index) {
+      <h3>{{FOOD_DATA[type].name}}</h3>
+      <ng-template
+        [ngTemplateOutlet]="entityParameters"
+        [ngTemplateOutletContext]="{
+          entityId: EditorInputId.food,
+          typeId: type,
+          form: form.food[type]
+        }"
+      />
+    }
+  }
+
+  <!-- Enemies -->
+  @case (PropertyTabId.enemies) {
+    @for (type of enemyTypes(); track $index) {
+      <h3>{{ ENEMY_DATA[type].name }}</h3>
+      <ng-template
+        [ngTemplateOutlet]="entityParameters"
+        [ngTemplateOutletContext]="{
+          entityId: EditorInputId.enemies,
+          typeId: type,
+          form: form.enemies[type]
+        }"
+      />
+    }
+  }
+}
+
+<!-- Template: Entity Parameters -->
+<ng-template #entityParameters let-entityId="entityId" let-typeId="typeId" let-form="form">
+  @for (parameter of editorEntityParameters; track $index) {
+    <ng-template
+      [ngTemplateOutlet]="textInput"
+      [ngTemplateOutletContext]="{
+        id: entityId + parameter + '-' + typeId,
+        label: ENTITY_PARAMETER[parameter],
+        field: form[parameter],
+        output: [entityId, typeId, parameter]
+      }"
+    />
+  }
+</ng-template>
+
+<!-- Template: Text Input -->
+<ng-template
+  #textInput
+  let-sectionClass="sectionClass"
+  let-id="id"
+  let-label="label"
+  let-field="field"
+  let-output="output">
+  <section [class]="sectionClass || null">
+    <label [for]="id">{{ label }}: </label>
+    <input
+      [id]="id"
+      type="text"
+      [field]="field"
+      (change)="onChange(output[0], output[1], output[2])"
+    />
+  </section>
+</ng-template>

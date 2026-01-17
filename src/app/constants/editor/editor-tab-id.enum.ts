@@ -1,4 +1,4 @@
 export enum EditorTabId {
-  properties = 1,
-  assets
+  assets = 1,
+  properties
 }

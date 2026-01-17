@@ -1,0 +1,104 @@
+<h3>Snake</h3>
+
+<div class="section">
+  <div class="section-line">
+    <span>Elapsed time:</span>
+    <span>{{game().stats.elapsedTime | secondsAsTime }}</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-line">
+    <span>Distance traveled:</span>
+    <span>{{ game().stats.stepsDone }}</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-line"> 
+    <span>Snake length:</span>
+    <span>
+      <ng-container>{{ snake().body.length + 2 }}</ng-container>
+      @if (game().delayedGrowth;as growth) {
+        <ng-container> (+{{ growth }})</ng-container>
+      }
+    </span>
+  </div>
+</div>
+
+<h3>Food</h3>
+
+<div class="section">
+  <div class="section-line"> 
+    <span>Total food eaten:</span>
+    <span>{{ game().stats.totalFoodEaten }}</span>
+  </div>
+  <div class="section-line"> 
+    <span>Total value consumed:</span>
+    <span>{{ game().stats.totalFoodValue }}</span>
+  </div>
+</div>
+
+<div class="section">
+  <table>
+    <tr>
+      <th>Food</th>
+      <th>On Map</th>
+      <th>Eaten</th>
+      <th>Value<br>Eaten</th>
+    </tr>
+    @for (foodType of foodTypes; track $index) {
+      @if (game().stats.food[foodType].present || game().stats.food[foodType].consumed) {
+        <tr>
+          <td>
+            <app-asset-block [type]="GameBlockType.food" [subType]="foodType" />
+            <span>{{ FOOD_DATA[foodType].name }}</span>
+          </td>
+          <td>{{ game().stats.food[foodType].present }}</td>
+          <td>{{ game().stats.food[foodType].consumed }}</td>
+          <td>{{ game().stats.food[foodType].valueConsumed }}</td>
+        </tr>
+      }
+    }
+  </table>
+</div>
+
+@if (levelHasEnemies()) {
+  <h3>Enemies</h3>
+
+  <div class="section">
+    <div class="section-line"> 
+      <span>Total enemies hit:</span>
+      <span>{{ game().stats.totalEnemiesHit }}</span>
+    </div>
+    <div class="section-line"> 
+      <span>Total damage taken:</span>
+      <span>{{ game().stats.totalDamageTaken }}</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <table>
+      <tr>
+        <th>Enemy</th>
+        <th>On Map</th>
+        <th>&emsp;Hit&emsp;</th>
+        <th>Damage<br>Taken</th>
+      </tr>
+      @for (enemyType of enemyTypes; track $index) {
+        @if (game().stats.enemies[enemyType].present || game().stats.enemies[enemyType].hit) {
+          <tr>
+            <td>
+              <app-asset-block [type]="GameBlockType.enemy" [subType]="enemyType" />
+              <span>{{ ENEMY_DATA[enemyType].name }}</span>
+            </td>
+            <td>{{ game().stats.enemies[enemyType].present }}</td>
+            <td>{{ game().stats.enemies[enemyType].hit }}</td>
+            <td>{{ game().stats.enemies[enemyType].damageTaken }}</td>
+          </tr>
+        }
+      }
+    </table>
+  </div>
+}
+

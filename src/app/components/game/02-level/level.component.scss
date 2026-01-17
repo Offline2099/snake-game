@@ -1,0 +1,67 @@
+@use '../../../../scss' as *;
+
+:host {
+  @include page;
+}
+
+@mixin width {
+  width: min($level-content-width, 100%);
+  min-width: $level-content-width-small;
+  @include small-screen {
+    width: $level-content-width-small;
+  }
+}
+
+header {
+  margin: 0 auto 30px auto;
+  @include width;
+  @include small-screen {
+    margin: 0 auto 5px auto;
+  }
+  h2 {  
+    text-align: center;
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-shadow: 2px 2px #222;
+    @include small-screen {
+      font-size: 24px;
+    }
+  }  
+}
+
+main {
+  display: flex;
+  gap: 25px;
+  margin: 0 auto 50px auto;
+  @include width;
+  @include hd {
+    padding: 0 25px;
+  }
+  @include small-screen {
+    gap: 10px;
+    height: 650px;
+    margin-bottom: 10px;
+    padding: 0;
+  }
+}
+
+.main-column,
+.side-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-column {
+  @include small-screen {
+    width: 500px;
+    overflow: hidden;
+  }
+}
+
+.side-column {
+  width: 100%;
+  @include small-screen {
+    width: 340px;
+  } 
+}

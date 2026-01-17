@@ -1,0 +1,11 @@
+@use '../base' as *;
+
+@mixin page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: max(100vh, 720px);
+  animation: fade-in .5s .1s both;
+}

@@ -1,0 +1,78 @@
+@use 'sass:color';
+@use '../../../../scss' as *;
+
+:host {
+  @include page;
+}
+
+.wrapper {
+  display: grid;
+  flex-grow: 1;
+  grid-template-columns: repeat(5, 1fr);
+  width: $menu-content-width;
+  min-height: 670px;
+  max-height: 1075px;
+  margin: 25px 0;
+  gap: 25px;
+  @include hd {
+    width: $menu-content-width-hd;
+    max-height: 830px;
+    gap: 10px;
+  }
+}
+
+$level-block-unlocked: #223322;
+$level-block-locked: #332222;
+
+@mixin stripes-and-border($base-color) {
+  $c1: color.adjust($base-color, $lightness: -0.5%);
+  $c2: color.adjust($base-color, $lightness: 1.75%);
+  border: 3px solid color.adjust($base-color, $lightness: 3%);
+  background: repeating-linear-gradient(-45deg, $c1 0, $c1 10px, $c2 11px, $c2 20px);
+}
+
+.level-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  text-shadow: 1px 1px #222;
+  letter-spacing: .05em;
+  transition: .2s;
+  cursor: pointer;
+  @include stripes-and-border($level-block-unlocked);
+  &.locked {
+    pointer-events: none;
+    @include stripes-and-border($level-block-locked);
+  }
+  @include hover {
+    filter: brightness(1.1);
+  }
+}
+
+.upper-block {
+  height: 40px;
+  margin-bottom: 20px;
+  .block-icon {
+    width: 40px;
+    height: 40px;
+    &.lock {
+      filter: brightness(.7);
+    }
+  }
+}
+
+.middle-block {
+  height: 48px;
+  text-align: center;
+  .level-name {
+    font-size: 20px;
+  }
+}
+
+.bottom-block {
+  height: 20px;
+  margin-top: 10px;
+  color: $text-darker;
+}

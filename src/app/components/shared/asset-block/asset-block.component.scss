@@ -16,31 +16,22 @@
   }
 }
 
-
-
-//$rock-outline: 1px solid #444;
-$rock-outline: 1px solid #333;
-$wall-border: 1px solid #444;
+//=============================================================================
+//  Obstacles
+//=============================================================================
 
 $wall-scale: 0.8;
 $wall-radius: calc($game-block-size / 2);
 
 :host.rock {
   border-radius: 2px;
-  outline: $rock-outline;
+  outline: 1px solid #333;
   transform: scale(0.85);
-  background: 
-    repeating-linear-gradient(45deg, transparent 0, transparent 5px, #383838 6px, transparent 7px, transparent 9px, #383838 10px),
-    repeating-linear-gradient(-45deg, #242424 0, #242424 5px, #383838 6px, #242424 7px, #242424 10px, #383838 11px);
+  @include pattern-bg(#242424, #383838);
 }
 
-:host.wall {
-  background: 
-    repeating-linear-gradient(45deg, transparent 0, transparent 5px, #383838 6px, transparent 7px, transparent 9px, #383838 10px),
-    repeating-linear-gradient(-45deg, #242424 0, #242424 5px, #383838 6px, #242424 7px, #242424 10px, #383838 11px);
-
-  //border: $wall-border;
-  overflow: hidden;
+:host.wall {  
+  @include pattern-bg(#242424, #383838);
   &.horizontal {
     border-left: none;
     border-right: none;
@@ -73,24 +64,31 @@ $wall-radius: calc($game-block-size / 2);
   }
 }
 
+//=============================================================================
+//  Portals
+//=============================================================================
 
+@mixin ellipse {
+  border-radius: 50%;
+  transform: scaleX(0.75) scaleY(.9);
+  img {
+    opacity: .5;
+  }
+}
 
 :host.portal-entrance {
-  border-radius: 50%;
-  background-color: deepskyblue;
-  transform: scaleX(0.75) scaleY(.9);
-  opacity: .6;
+  background-color: color.adjust(deepskyblue, $alpha: -0.5);
+  @include ellipse;
 }
 
 :host.portal-exit {
-  border-radius: 50%;
-  background-color:  #ff9900;
-  transform: scaleX(0.75) scaleY(.9);
-  opacity: .7;
+  background-color: color.adjust(#ff9900, $alpha: -0.4);
+  @include ellipse;
 }
 
-
-
+//=============================================================================
+//  Food
+//=============================================================================
 
 $food-normal: green;
 $food-yummy: teal;
@@ -105,6 +103,15 @@ $food-delicious: blueviolet;
   box-shadow: 0 0 2px 2px color.adjust($color, $alpha: -0.5);
 }
 
+@mixin food-node($color) {
+  &:before {
+    background-color: $color;
+  }
+  &:after {
+    @include food-shadow($color);
+  }
+}
+
 :host.food {
   &:before {
     @include food-overlay;
@@ -114,28 +121,13 @@ $food-delicious: blueviolet;
     @include food-overlay;
   }
   &.normal {
-    &:before {
-      background-color: $food-normal;
-    }
-    &:after {
-      @include food-shadow($food-normal);
-    }
+    @include food-node($food-normal);
   }
   &.yummy {
-    &:before {
-      background-color: $food-yummy;
-    }
-    &:after {
-      @include food-shadow($food-yummy);
-    }
+    @include food-node($food-yummy);
   }
   &.delicious {
-    &:before {
-      background-color: $food-delicious;
-    }
-    &:after {
-      @include food-shadow($food-delicious);
-    }
+    @include food-node($food-delicious);
   }
 }
 
@@ -151,9 +143,9 @@ $food-delicious: blueviolet;
   }
 }
 
-
-
-
+//=============================================================================
+//  Snake
+//=============================================================================
 
 @mixin rotate-to-direction {
   &.up {
@@ -167,9 +159,7 @@ $food-delicious: blueviolet;
   }
 }
 
-//$snake-color: #007777;
 $snake-color: #006666;
-//$snake-eyes-color: #00cc88;
 $snake-eyes-color: #00aaaa;
 
 $snake-dead-color: maroon;
@@ -189,7 +179,6 @@ $snake-success-color: darkgreen;
   height: $game-block-size;  
   @include snake-color($snake-color);
   &.head {
-    //clip-path: path("M10,0 C15,0 20,10 20,15 C20,20 10,20 10,20 C10,20 0,20 0,15 C0,10 5,0 10,0 Z");
     clip-path: inset(2px 0 2px 0 round 0 10px 10px 0);
     @include rotate-to-direction;
     &:before,
@@ -241,20 +230,3 @@ $snake-success-color: darkgreen;
     @include snake-color($snake-success-color);
   }
 }
-
-
-// Temporarty for debugging
-// :host {
-//   &.no-enemies {
-//     opacity: .2;
-//     background-color: yellow;
-//   }
-//   &.no-food {
-//     opacity: .2;
-//     background-color: blue;
-//   }
-//   &.all {
-//     opacity: .2;
-//     background-color: red;
-//   }
-// }

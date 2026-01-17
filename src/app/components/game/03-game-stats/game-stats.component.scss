@@ -1,0 +1,52 @@
+@use '../../../../scss' as *;
+
+:host {
+  height: 100%;
+  @include side-column-area;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+tr {
+  border-bottom: 1px solid $border-dim;
+  &:last-child {
+    border: none;
+  }
+}
+
+th, td {
+  padding: 3px;
+  border-right: 1px solid $border-dim;
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
+  &:last-child {
+    border: none;
+  }
+  @include small-screen {
+    font-size: 12px;
+  }
+}
+
+th {
+  font-weight: 400;
+}
+
+td:first-child {
+  min-width: 100px;
+  align-items: center;
+  text-align: left;
+  @include small-screen {
+    min-width: 85px;
+  }
+  & > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  span {
+    margin-left: 5px;
+  }
+}

@@ -1,0 +1,6 @@
+@use '../../../../scss' as *;
+
+:host {
+  height: 50%;
+  @include side-column-area;
+}

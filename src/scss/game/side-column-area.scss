@@ -1,0 +1,59 @@
+@use 'sass:color';
+@use '../base' as *;
+
+@mixin side-column-area {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: color.adjust(black, $alpha: -0.75);
+  h3 {
+    margin: 20px 0 5px 0;
+    padding-left: 5px;
+    border-bottom: 1px solid $border-normal;
+    font-size: 18px;
+    font-weight: 500;
+    &:first-child {
+      margin-top: 5px;
+    }
+    @include small-screen {
+      font-size: 17px;
+    }
+  }
+  .section {
+    margin: 10px 0;
+    letter-spacing: .05em;
+    .section-line {
+      display: flex;
+      padding-left: 5px;
+      padding-right: 10px;
+      border-bottom: 1px solid $border-dim;
+      font-size: 15px;
+      @include small-screen {
+        font-size: 14px;
+      }
+      span:last-child{
+        margin-left: auto;
+      }
+    }
+  }
+  ul {
+    margin: 10px 0 0 20px;
+    font-size: 15px;
+    @include small-screen {
+      font-size: 14px;
+    }
+    li {
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid $border-dark;
+      letter-spacing: .03em;
+      &:last-of-type {
+        border-bottom: none;
+      }
+    }
+  }
+  app-asset-block {
+    width: 15px;
+    height: 15px;
+    margin-bottom: 2px;
+  }
+}

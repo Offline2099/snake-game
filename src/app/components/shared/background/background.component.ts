@@ -36,17 +36,7 @@ export class BackgroundComponent {
     for (let x = 0; x < canvas.width; x += TILE_SIZE) {
       for (let y = 0; y < canvas.height; y += TILE_SIZE) {
         const distances: number[] = seeds.map(seed => this.distance(seed, {x,y}));
-        let smallest = Number.MAX_SAFE_INTEGER;
-        let secondSmallest = Number.MAX_SAFE_INTEGER;
-        for (let i = 0; i < distances.length; i++) {
-          if (distances[i] < smallest) {
-            secondSmallest = smallest;
-            smallest = distances[i];
-          }
-          else if (distances[i] < secondSmallest && distances[i] != smallest) {
-            secondSmallest = distances[i];
-          }
-        }
+        const [smallest, secondSmallest]: number[] = this.findSmallestAndSecondSmallest(distances);
         ctx.fillStyle = `hsl(${this.hue()} 25% ${0.6 * Math.min(25, 10 * secondSmallest / smallest)}%`;
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
       }
@@ -63,6 +53,21 @@ export class BackgroundComponent {
 
   distance(a: Position, b: Position): number {
     return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+  }
+
+  findSmallestAndSecondSmallest(array: number[]): number[] {
+    let smallest = Number.MAX_SAFE_INTEGER;
+    let secondSmallest = Number.MAX_SAFE_INTEGER;
+    for (let i = 0; i < array.length; i++) {
+      if (array[i] < smallest) {
+        secondSmallest = smallest;
+        smallest = array[i];
+      }
+      else if (array[i] < secondSmallest && array[i] != smallest) {
+        secondSmallest = array[i];
+      }
+    }
+    return [smallest, secondSmallest];
   }
 
 }

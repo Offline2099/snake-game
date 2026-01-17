@@ -1,9 +1,0 @@
-@use './base' as *;
-
-@mixin page {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
-  animation: fade-in .5s .1s both;
-}

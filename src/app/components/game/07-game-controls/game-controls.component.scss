@@ -1,0 +1,87 @@
+@use '../../../../scss' as *;
+
+:host {
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  margin-top: 10px;
+  justify-content: center;
+  align-items: center;
+  @include side-column-area;
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  border-color: $border-dim;
+  border-radius: 5px;
+  font-size: 18px;
+  animation: fade-in .2s;
+  @include small-screen {
+    font-size: 16px;
+  }
+  &.start {
+    background: #223322;
+    border-color: #334433;
+    @include hover {
+      filter: brightness(1.2)
+    }
+  }
+  img {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    @include small-screen {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+.default-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  button {
+    width: 50%;
+  }
+}
+
+.controls-overlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 5px;
+  animation: grow .2s;
+  @include element-overlay;
+}
+
+.overlay-header {
+  width: 80%;
+  margin-bottom: 10px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid $border-dim;
+  font-size: 20px;
+  font-weight: 500;
+  text-align: center;
+  .victory & {
+    color: green;
+  }
+  .defeat & {
+    color: #b30000;
+  }
+}
+
+.overlay-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}

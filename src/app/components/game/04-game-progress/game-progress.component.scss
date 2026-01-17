@@ -1,0 +1,72 @@
+@use '../../../../scss' as *;
+
+:host {
+  display: flex;
+  padding: 5px 10px;
+  gap: 10px;
+  border: 1px solid $border-dim;
+  border-radius: 4px;
+  text-shadow: 1px 1px #222;
+  @include pattern-bg($bg-medium, $border-dim);
+}
+
+.label {
+  display: flex;
+  &.value {
+    margin-left: auto;
+  }
+  .absolute {
+    width: 80px;
+    text-align: center;
+  }
+  .percentage {
+    width: 50px;
+    text-align: center;
+  }
+  @include small-screen {
+    font-size: 14px;
+    .absolute {
+      width: 70px;
+    }
+    .percentage {
+      width: 45px;
+    }
+  }
+}
+
+.progress-bar-container {
+  position: relative;
+  display: flex;
+  width: 450px;
+  border: 1px solid $border-dark;
+  border-radius: 5px;
+  background-color: $bg-base;
+  overflow: hidden;
+  @include small-screen {
+    width: 280px;
+  }
+  &:before {
+    z-index: 5;
+    background: repeating-linear-gradient(90deg, transparent 0, transparent 9px, $border-dim 10px);
+    @include pseudo-element-overlay;
+  }
+}
+
+.progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  max-width: 100%;
+  background-color: darkgreen;
+  border-radius: 3px;
+  &.positive {
+    background-color: green;
+  }
+  &.negative {
+    background-color: maroon;
+  }
+  &.delayed {
+    transition: width 1s;
+  }
+}

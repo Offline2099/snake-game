@@ -1,0 +1,19 @@
+@use '../../../../scss' as *;
+
+:host {
+  margin-top: 5px;
+  padding: 10px;
+  border: 1px solid $border-dim;
+  border-radius: 4px;
+  @include pattern-bg($bg-medium, $border-dim);
+  @include small-screen {
+    height: 500px;
+  }
+}
+
+.game-space {
+  @include small-screen {
+    transform-origin: top left;
+    transform: scale($level-fit-scale);
+  }
+}
