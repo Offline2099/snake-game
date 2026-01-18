@@ -1,12 +1,16 @@
 {
-  "name": "snake-game",
-  "version": "0.0.0",
+  "name": "snake-game-prototype",
+  "version": "0.0.1",
+  "main": "main.js",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start1": "ng serve",
+    "build1": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "electron": "electron .",
+    "build": "ng build --prod --base-href ./",
+    "pack": "electron-builder"
   },
   "prettier": {
     "printWidth": 100,
@@ -21,21 +25,36 @@
     ]
   },
   "private": true,
-  "packageManager": "npm@11.7.0",
   "dependencies": {
-    "@angular/common": "^21.0.0",
-    "@angular/compiler": "^21.0.0",
-    "@angular/core": "^21.0.0",
-    "@angular/forms": "^21.0.0",
-    "@angular/platform-browser": "^21.0.0",
-    "@angular/router": "^21.0.0",
+    "@angular/common": "^21.0.6",
+    "@angular/compiler": "^21.0.6",
+    "@angular/core": "^21.0.6",
+    "@angular/forms": "^21.0.6",
+    "@angular/platform-browser": "^21.0.6",
+    "@angular/router": "^21.0.6",
+    "asar": "^3.2.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular/build": "^21.0.4",
     "@angular/cli": "^21.0.4",
-    "@angular/compiler-cli": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.6",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
     "typescript": "~5.9.2"
+  },
+  "build": {
+    "npmRebuild": false,
+    "appId": "com.example.myapp",
+    "productName": "Snake Game Prototype",
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "files": [
+      "dist/snake-game/browser/**/*",
+      "main.js"
+    ]
   }
 }
