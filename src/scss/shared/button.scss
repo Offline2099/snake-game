@@ -11,6 +11,9 @@ button {
   @include hover {
     background-color: $bg-button-hovered;
   }
+  &:focus {
+    outline: none;
+  }
   &.disabled {
     opacity: .5;
     pointer-events: none;
