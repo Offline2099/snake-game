@@ -16,9 +16,9 @@ import { LevelSettings } from '../types/level/level-settings.type';
 const PROGRESSION_KEY: string = 'level-progression';
 const SETTINGS_KEY: string = 'level-settings';
 
-const DATA_URL: string = '/data';
+const DATA_URL: string = 'data';
 
-const ALWAYS_UNLOCKED_ID: number[] = [1];
+const ALWAYS_UNLOCKED_ID: number[] = [...Array(20).keys()].map(i => i + 1);
 
 @Injectable({
   providedIn: 'root'
