@@ -1,5 +1,18 @@
 @if (game().state === GameState.ready || game().state === GameState.running) {
   <div class="default-buttons">
+    @if (level().progression.bestTime > 0) {
+      <div class="section-line">
+        <ng-container>Best Time: </ng-container>
+        <ng-container>{{ level().progression.bestTime | secondsAsTime }}</ng-container>
+      </div>
+    } @else {
+      <div class="section-line">
+        <ng-container>Best Attempt: </ng-container>
+        <ng-container>{{ level().progression.bestProgress }}</ng-container>
+        <ng-container>&hairsp;/&hairsp;</ng-container>
+        <ng-container>{{ level().settings.goal }}</ng-container>
+      </div>
+    }
     <button
       type="button"
       class="start"
