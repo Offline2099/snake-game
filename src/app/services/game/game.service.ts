@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Direction } from '../../constants/general/direction.enum';
 import { AREA_SIZE } from '../../constants/game/game-area';
 import { DEFAULT_STEP_TIME } from '../../constants/game/default-step-time';
+import { GameState } from '../../constants/game/game-state.enum';
 import { GameBlockType } from '../../constants/game/game-block-type.enum';
 import { FoodType } from '../../constants/food/food-type.enum';
 import { EnemyType } from '../../constants/enemies/enemy-type.enum';
@@ -41,8 +42,7 @@ export class GameService {
   initialize(snake: Snake, level: Level): Game {
     const game: Game = {
       space: this.spaceService.createSpace(AREA_SIZE, AREA_SIZE),
-      isDefeat: false,
-      isVictory: false,
+      state: GameState.ready,
       progress: 0,
       stepTime: DEFAULT_STEP_TIME,
       stats: {
@@ -81,7 +81,7 @@ export class GameService {
 
   processStep(game: Game, snake: Snake, level: Level): void {
     if (game.progress >= level.settings.goal) {
-      game.isVictory = true;
+      game.state = GameState.victory;
       return;
     }
     game.stats.stepsDone++;
@@ -92,7 +92,7 @@ export class GameService {
     this.processCollisionDetection(game, positionAhead);
     this.processFoodInteraction(game, level, snake, positionAhead);
     this.processEnemyInteraction(game, level, snake, positionAhead);
-    if (game.isDefeat || game.isVictory) return;
+    if (game.state === GameState.defeat || game.state === GameState.victory) return;
     if (snake.body.length <= lengthBeforeInteractions && game.delayedGrowth > 0) {
       this.snakeService.growSnake(snake);
       game.delayedGrowth--;
@@ -101,7 +101,7 @@ export class GameService {
   }
 
   private processCollisionDetection(game: Game, position: Position): void {
-    if (this.spaceService.isCollisionAhead(game.space, position)) game.isDefeat = true;
+    if (this.spaceService.isCollisionAhead(game.space, position)) game.state = GameState.defeat;
   }
 
   private processFoodInteraction(game: Game, level: Level, snake: Snake, position: Position): void {

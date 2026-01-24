@@ -1,5 +1,7 @@
-import { Component, HostListener, input, output } from '@angular/core';
+import { Component, ChangeDetectorRef, HostListener, input, output } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
+// Constants & Enums
+import { GameState } from '../../../constants/game/game-state.enum';
 // Interfaces & Types
 import { Game } from '../../../types/game/game.interface';
 import { Level } from '../../../types/level/level.interface';
@@ -54,6 +56,7 @@ export class LevelComponent {
   timer: Subscription | null = null;
 
   constructor(
+    private cdr: ChangeDetectorRef,
     private snakeService: SnakeService,
     private gameService: GameService,
     private progression: ProgressionService
@@ -71,8 +74,10 @@ export class LevelComponent {
 
   startTimer(): void {
     if (this.timer) this.stopTimer();
+    this.game.state = GameState.running;
     this.timer = interval(this.game.stepTime).subscribe(() => {
       this.processGameStep(this.game, this.snake, this.level());
+      this.cdr.markForCheck();
     });
   }
 
@@ -84,10 +89,10 @@ export class LevelComponent {
 
   processGameStep(game: Game, snake: Snake, level: Level): void {
     this.gameService.processStep(game, snake, level);
-    if (game.isDefeat || game.isVictory) {
+    if (game.state === GameState.defeat || game.state === GameState.victory) {
       this.stopTimer();
       this.progression.updateLevelProgression(game, this.level(), this.nextLevelId());
-      if (game.isVictory) this.victory.emit();
+      if (game.state === GameState.victory) this.victory.emit();
     }
   }
 

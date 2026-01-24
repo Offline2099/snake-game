@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
+import { GameState } from '../../constants/game/game-state.enum';
 import { GameBlockType } from '../../constants/game/game-block-type.enum';
 import { FoodType } from '../../constants/food/food-type.enum';
 import { EnemyType } from '../../constants/enemies/enemy-type.enum';
@@ -134,7 +135,7 @@ export class GameEntityService {
     const damage: number = ENEMY_DATA[enemyType].damage;
     this.recordEnemyInteraction(game, level, enemyType);
     if (damage >= snakeHealth) {
-      game.isDefeat = true;
+      game.state = GameState.defeat;
       return;
     }
     const spawnAmount: number = level.settings.enemies[enemyType][EntityParameterId.spawnOnInteraction];

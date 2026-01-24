@@ -1,5 +1,5 @@
 <div class="game-space">
-  @for (column of game().space; track $index; let x = $index) {
+  @for (column of space(); track $index; let x = $index) {
     @for (block of column; track $index; let y = $index) {
       @if (block.type !== GameBlockType.free) {
         <app-asset-block 
@@ -11,11 +11,25 @@
             'bottom.px': BLOCK_SIZE * y
           }"
           [ngClass]="{
-            'fail': game().isDefeat,
-            'success': game().isVictory
+            'fail': gameState() === GameState.defeat,
+            'success': gameState() === GameState.victory
           }"
         />
       }
     }
+  }
+  @for (change of progressChanges; track change.id) {
+    <div
+      class="progress-value"
+      [ngClass]="{ 'damage': change.value < 0 }"
+      [ngStyle]="{
+        'left.px': BLOCK_SIZE * (change.position.x + .5),
+        'bottom.px': BLOCK_SIZE * (change.position.y + .5)
+      }">
+      @if (change.value > 0) {
+        <ng-container>+</ng-container>
+      }
+      <ng-container>{{ change.value }}</ng-container>
+    </div>
   }
 </div>

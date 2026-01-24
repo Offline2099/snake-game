@@ -1,12 +1,22 @@
-import { Component, ChangeDetectorRef, input } from '@angular/core';
+import { Component, input, effect } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { interval } from 'rxjs';
+// Constants & Enums
 import { AREA_SIZE, BLOCK_SIZE } from '../../../constants/game/game-area';
-import { DEFAULT_STEP_TIME } from '../../../constants/game/default-step-time';
+import { GameState } from '../../../constants/game/game-state.enum';
 import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { Game } from '../../../types/game/game.interface';
+// Interfaces & Types
+import { Position } from '../../../types/general/position.interface';
+import { Space } from '../../../types/game/space/space.type';
+// Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
+
+const MAX_CHANGES_LENGTH: number = 15;
+
+interface ProgressChange {
+  id: number;
+  position: Position;
+  value: number;
+}
 
 @Component({
   selector: 'app-game-area',
@@ -18,12 +28,50 @@ export class GameAreaComponent {
 
   readonly AREA_SIZE = AREA_SIZE;
   readonly BLOCK_SIZE = BLOCK_SIZE;
+  readonly GameState = GameState;
   readonly GameBlockType = GameBlockType;
 
-  game = input.required<Game>();
+  space = input.required<Space>();
+  gameState = input.required<GameState>();
+  progress = input.required<number>();
+  headPosition = input.required<Position>();
 
-  constructor(private cdr: ChangeDetectorRef) {
-    interval(DEFAULT_STEP_TIME).pipe(takeUntilDestroyed()).subscribe(() => this.cdr.markForCheck());
+  previousProgress!: number;
+  latestChange!: number;
+  latestChangeId!: number;
+  progressChanges!: ProgressChange[];
+
+  constructor() {
+    this.resetProgressChanges();
+    effect(() => 
+      this.updateProgressChanges(this.gameState(), this.progress(), this.headPosition())
+    );
+  }
+
+  resetProgressChanges(): void {
+    this.previousProgress = 0;
+    this.latestChange = 0;
+    this.latestChangeId = 0;
+    this.progressChanges = [];
+  }
+
+  updateProgressChanges(gameState: GameState, progress: number, position: Position): void {
+    if (gameState === GameState.ready) {
+      this.resetProgressChanges();
+      return;
+    }
+    this.latestChange = progress - this.previousProgress;
+    this.previousProgress = progress;
+    if (this.latestChange !== 0) {
+      this.latestChangeId++;
+      this.progressChanges.push({
+        id: this.latestChangeId,
+        position: { ...position },
+        value: this.latestChange
+      });
+    }
+    if (this.progressChanges.length > MAX_CHANGES_LENGTH)
+      this.progressChanges.shift();
   }
 
 }

@@ -13,11 +13,16 @@
   <!-- Central Column -->
   <div class="main-column">
     <app-game-progress
+      [gameState]="game.state"
       [progress]="game.progress"
       [goal]="level().settings.goal"
-      [isActive]="timer !== null || game.isDefeat || game.isVictory" 
     />
-    <app-game-area [game]="game" />
+    <app-game-area
+      [space]="game.space"
+      [gameState]="game.state"
+      [progress]="game.progress"
+      [headPosition]="snake.head.currentPosition"
+    />
   </div>
 
   <!-- Right Column -->
