@@ -17,3 +17,15 @@
     transform: scale($level-fit-scale);
   }
 }
+
+.progress-value {
+  position: absolute;
+  z-index: 2;
+  font-weight: 900;
+  color: limegreen;
+  text-shadow: 2px 2px black;
+  animation: fade-in 1.5s reverse both;
+  &.damage {
+    color: red;
+  }
+}
