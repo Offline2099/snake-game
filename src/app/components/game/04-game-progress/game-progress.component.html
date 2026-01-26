@@ -1,6 +1,6 @@
 <div class="label">Progress: </div>
 <div class="progress-bar-container">
-  @if (isActive()) {
+  @if (gameState() !== GameState.ready) {
     <div
       class="progress-bar"
       [ngClass]="{

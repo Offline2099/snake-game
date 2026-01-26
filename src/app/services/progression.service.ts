@@ -5,6 +5,7 @@ import { tap, of, catchError, Observable, map } from 'rxjs';
 // Constants & Enums
 import { DEFAULT_PROGRESSION } from '../constants/level/default-progression';
 import { DEFAULT_LEVEL_DATA } from '../constants/level/default-level-settings';
+import { GameState } from '../constants/game/game-state.enum';
 // Interfaces & Types
 import { Game } from '../types/game/game.interface';
 import { Level } from '../types/level/level.interface';
@@ -19,6 +20,7 @@ const SETTINGS_KEY: string = 'level-settings';
 const DATA_URL: string = 'data';
 
 const ALWAYS_UNLOCKED_ID: number[] = [1];
+//const ALWAYS_UNLOCKED_ID: number[] = [...Array(20).keys()].map(i => i + 1);
 
 @Injectable({
   providedIn: 'root'
@@ -56,7 +58,7 @@ export class ProgressionService {
 
   updateLevelProgression(game: Game, level: Level, nextLevelId: number | null): void {
     const progression: LevelProgression = this.getLevelProgression(level.id);
-    if (game.isVictory) {
+    if (game.state === GameState.victory) {
       progression.isComplete = true;
       if (!progression.bestTime || progression.bestTime > game.stats.elapsedTime)
         progression.bestTime = game.stats.elapsedTime;

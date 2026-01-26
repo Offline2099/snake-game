@@ -1,5 +1,6 @@
 import { Component, input, computed, effect } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
+import { GameState } from '../../../constants/game/game-state.enum';
 
 @Component({
   selector: 'app-game-progress',
@@ -9,9 +10,11 @@ import { NgClass, NgStyle } from '@angular/common';
 })
 export class GameProgressComponent {
 
+  readonly GameState = GameState;
+
+  gameState = input.required<GameState>();
   progress = input.required<number>();
   goal = input.required<number>();
-  isActive = input.required<boolean>();
 
   percentage = computed(() => Math.floor(100 * this.progress() / this.goal()));
 

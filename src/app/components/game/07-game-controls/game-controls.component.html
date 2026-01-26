@@ -1,9 +1,22 @@
-@if (!game().isDefeat && !game().isVictory) {
+@if (game().state === GameState.ready || game().state === GameState.running) {
   <div class="default-buttons">
+    @if (level().progression.bestTime > 0) {
+      <div class="section-line">
+        <ng-container>Best Time: </ng-container>
+        <ng-container>{{ level().progression.bestTime | secondsAsTime }}</ng-container>
+      </div>
+    } @else {
+      <div class="section-line">
+        <ng-container>Best Attempt: </ng-container>
+        <ng-container>{{ level().progression.bestProgress }}</ng-container>
+        <ng-container>&hairsp;/&hairsp;</ng-container>
+        <ng-container>{{ level().settings.goal }}</ng-container>
+      </div>
+    }
     <button
       type="button"
       class="start"
-      [ngClass]="{ 'disabled': game().stats.stepsDone > 0 }"
+      [ngClass]="{ 'disabled': game().state === GameState.running }"
       (click)="startGame()">
       <img src="images/buttons/start.svg" alt="" />
       <ng-container>Start</ng-container>
@@ -15,7 +28,7 @@
   </div>
 }
 
-@if (game().isDefeat) {
+@if (game().state === GameState.defeat) {
   <div class="controls-overlay defeat">
     <div class="overlay-header">YOU DIED</div>
     @if (isNewBestAttempt()) {
@@ -40,7 +53,7 @@
   </div>
 }
 
-@if (game().isVictory) {
+@if (game().state === GameState.victory) {
   <div class="controls-overlay victory">
     <div class="overlay-header">VICTORY</div>
     @if (isNewBestTime()) {
