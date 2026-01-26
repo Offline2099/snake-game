@@ -1,6 +1,33 @@
 <h3>Instructions</h3>
 <ul>
-  @for (instruction of level().settings.instructions; track $index) {
-    <li>{{instruction}}</li>
+  @for (instruction of instructions(); track $index) {
+    <li>
+      @for (part of instruction; track $index) {
+        @if (typeof part === 'string') {
+          <ng-container>{{ part }}</ng-container>
+        } @else {
+          @switch (part.type) {
+            @case (InstructionPartType.key) {
+              <span class="item-container key">
+                <img src="images/keys/{{ part.icon }}.svg" alt="" />
+                <ng-container>{{ part.name }}</ng-container>
+              </span>
+            }
+            @case (InstructionPartType.button) {
+              <span class="item-container button">
+                <img src="images/buttons/{{ part.icon }}.svg" alt="" />
+                <ng-container>{{ part.name }}</ng-container>
+              </span>
+            }
+            @case (InstructionPartType.asset) {
+              <span class="item-container">
+                <app-asset-block [type]="part.assetType" [subType]="part.assetSubType" />
+                <ng-container>{{ part.assetName }}</ng-container>
+              </span>
+            }
+          }
+        }
+      }
+    </li>
   }
 </ul>
