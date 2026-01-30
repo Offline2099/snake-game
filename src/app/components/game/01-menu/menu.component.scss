@@ -40,6 +40,7 @@ $level-block-locked: #332222;
   text-shadow: 1px 1px #222;
   letter-spacing: .05em;
   transition: .2s;
+  animation: grow .5s .2s both;
   cursor: pointer;
   @include stripes-and-border($level-block-unlocked);
   &.locked {

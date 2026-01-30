@@ -1,6 +1,21 @@
-@if (type() === GameBlockType.enemy) {
-  <img src="images/game-blocks/{{ BLOCK_CLASS[type()][subType()!] }}.svg" alt="" />
-}
-@if (type() === GameBlockType.portal) {
-  <img src="images/game-blocks/portal.svg" alt="" />
+@switch (type()) {
+  @case (GameBlockType.enemy) {
+    <img src="images/game-blocks/{{ BLOCK_CLASS[type()][subType()!] }}.svg" alt="" />
+  }
+  @case (GameBlockType.portal) {
+    <img src="images/game-blocks/portal.svg" alt="" />
+  }
+  @case (GameBlockType.snakeHead) {
+    <img src="images/game-blocks/snake-head.svg" alt="" />
+  }
+  @case (GameBlockType.snakeBody) {
+    @if (subType() === BodyBlockType.horizontal || subType() === BodyBlockType.vertical) {
+      <img src="images/game-blocks/snake-body.svg" alt="" />
+    } @else {
+      <img src="images/game-blocks/snake-body-turn.svg" alt="" />
+    }
+  }
+  @case (GameBlockType.snakeTail) {
+    <img src="images/game-blocks/snake-tail.svg" alt="" />
+  }
 }

@@ -1,0 +1,16 @@
+<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <radialGradient id="gradient" cx="0" cy="0" gradientTransform="scale(2.5)">
+      <stop offset="15%" stop-color="#005555" />
+      <stop offset="50%" stop-color="#006677" />
+      <stop offset="85%" stop-color="#005555" />
+    </radialGradient>
+    <path id="shape" d="M -2 4 L 0 0 L 2 4" fill="#003333" />
+  </defs>
+  <path d="M 0 3 C 2 3 3 2 3 0 L 17 0 C 17 11 11 17 0 17 Z" fill="url('#gradient')" />
+  <use xlink:href="#shape" x="0" y="5" transform="rotate(-25)" />
+  <use xlink:href="#shape" x="0" y="5" transform="rotate(-65)" />
+  <use xlink:href="#shape" x="0" y="5" transform="rotate(-18) rotate(180 0 10)" />
+  <use xlink:href="#shape" x="0" y="5" transform="rotate(-45) rotate(180 0 10)" />
+  <use xlink:href="#shape" x="0" y="5" transform="rotate(-72) rotate(180 0 10)" />
+</svg>

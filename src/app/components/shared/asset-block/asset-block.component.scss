@@ -159,60 +159,15 @@ $food-delicious: blueviolet;
   }
 }
 
-$snake-color: #006666;
-$snake-eyes-color: #00aaaa;
-
-$snake-dead-color: maroon;
-$snake-success-color: darkgreen;
-
-@mixin snake-color($color) {
-  box-shadow: 
-    0 0 2px 2px $color inset,
-    0 0 8px 8px color.adjust($color, $alpha: -0.5) inset;
-  background: 
-    repeating-linear-gradient(45deg, transparent 0, transparent 3px, #000 4px, #000 4px),
-    repeating-linear-gradient(-45deg, $color 0, $color 3px, #000 4px, #000 4px);
-}
-
 :host.snake-block {
   width: $game-block-size;
-  height: $game-block-size;  
-  @include snake-color($snake-color);
-  &.head {
-    clip-path: inset(2px 0 2px 0 round 0 10px 10px 0);
-    @include rotate-to-direction;
-    &:before,
-    &:after {
-      content: '';
-      position: absolute;
-      left: 45%;
-      width: 25%;
-      height: 20%;
-      background: $snake-eyes-color;
-      border-radius: 50%;
-    }
-    &:before {
-      top: 25%;
-    }
-    &:after {
-      bottom: 25%;
-    }
-  }
+  height: $game-block-size;
+  &.head,
   &.tail {
-    clip-path: inset(2px 0 2px 0 round 10px 0 0 10px);
     @include rotate-to-direction;
-  }
-  &.horizontal {
-    clip-path: inset(2px 0);    
   }
   &.vertical {
-    clip-path: inset(0 2px);
-  }
-  &.round-top-left,
-  &.round-top-right,
-  &.round-bottom-left,
-  &.round-bottom-right {
-    clip-path: path('M 0 2 A 2 2 0 0 0 2 0 L 19 0 L 19 10 C 19 15 15 19 10 19 L 0 19 Z');
+    transform: rotate(90deg);
   }
   &.round-top-left {
     transform: rotate(180deg);
@@ -224,9 +179,9 @@ $snake-success-color: darkgreen;
     transform: rotate(90deg);
   }
   &.fail {
-    @include snake-color($snake-dead-color);
+    filter: hue-rotate(180deg) saturate(200%) brightness(60%);
   }
   &.success {
-    @include snake-color($snake-success-color);
+    filter: hue-rotate(-40deg) saturate(200%) brightness(80%);
   }
 }
