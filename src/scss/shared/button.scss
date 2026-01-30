@@ -8,6 +8,9 @@ button {
   letter-spacing: .05em;
   transition: .2s;
   cursor: pointer;
+  &, &:focus {
+    outline: none;
+  }
   @include hover {
     background-color: $bg-button-hovered;
   }

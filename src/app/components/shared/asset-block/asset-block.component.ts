@@ -1,5 +1,6 @@
 import { Component, HostBinding, input } from '@angular/core';
 import { GameBlockType } from '../../../constants/game/game-block-type.enum';
+import { BodyBlockType } from '../../../constants/snake/body-block-type.enum';
 import { BLOCK_CLASS } from '../../../constants/game/block-class';
 import { GameBlockSubType } from '../../../types/game/space/game-block-subtype.type';
 
@@ -18,6 +19,7 @@ export class AssetBlockComponent {
   }
 
   readonly GameBlockType = GameBlockType;
+  readonly BodyBlockType = BodyBlockType;
   readonly BLOCK_CLASS = BLOCK_CLASS;
 
   type = input.required<GameBlockType>();
