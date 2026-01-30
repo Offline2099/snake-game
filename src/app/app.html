@@ -1,1 +1,13 @@
 <router-outlet />
+
+<div class="app-controls">
+  <button type="button" (click)="minimize()">
+    <img src="images/buttons/minimize.svg" alt="" />
+  </button>
+  <button type="button" (click)="toggleFullScreen()">
+    <img src="images/buttons/{{ isFullScreen ? 'window' : 'fullscreen' }}.svg" alt="" />
+  </button>
+  <button type="button" (click)="closeApp()">
+    <img src="images/buttons/close.svg" alt="" />
+  </button>
+</div>

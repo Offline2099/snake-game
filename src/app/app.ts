@@ -8,5 +8,20 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss'
 })
 export class App {
+
+  isFullScreen: boolean = false;
+
+  minimize(): void {
+    window.electron.minimize();
+  }
+
+  toggleFullScreen(): void {
+    this.isFullScreen = !this.isFullScreen;
+    window.electron.toggleFullscreen();
+  }
+
+  closeApp(): void {
+    window.electron.close();
+  }
   
 }

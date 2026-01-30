@@ -1,6 +1,6 @@
 {
   "name": "snake-game-prototype",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "main.js",
   "scripts": {
     "ng": "ng",
@@ -50,11 +50,12 @@
     "productName": "Snake Game Prototype",
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "icon.ico"
     },
     "files": [
       "dist/snake-game/browser/**/*",
-      "main.js"
+      "main.js",
+      "preload.js"
     ]
   }
 }
