@@ -37,7 +37,7 @@ export class LevelComponent {
   }
 
   handleKeyboardEvent(key: string): void {
-    if (key === ' ' && !this.timer) {
+    if (key === ' ' && this.game.state === GameState.ready) {
       this.startTimer();
       return;
     }
