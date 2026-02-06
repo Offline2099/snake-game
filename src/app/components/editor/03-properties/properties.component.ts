@@ -1,6 +1,6 @@
 import { Component, computed, linkedSignal, model } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { form, Field } from '@angular/forms/signals';
+import { form, FormField } from '@angular/forms/signals';
 // Constants & Enums
 import { PROPERTY_TABS } from '../../../constants/editor/property-tabs';
 import { PropertyTabId } from '../../../constants/editor/property-tab-id.enum';
@@ -45,7 +45,7 @@ const ENTITY_PARAMETER: Record<EntityParameterId, string> = {
 
 @Component({
   selector: 'app-properties',
-  imports: [NgClass, NgTemplateOutlet, Field],
+  imports: [NgClass, NgTemplateOutlet, FormField],
   templateUrl: './properties.component.html',
   styleUrl: './properties.component.scss',
 })
