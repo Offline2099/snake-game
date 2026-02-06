@@ -30,7 +30,7 @@
       <textarea
         [id]="EditorInputId.levelInstructions"
         rows="20"
-        [field]="form.instructions"
+        [formField]="form.instructions"
         (change)="onChange(EditorInputId.levelInstructions)">
       </textarea>
     </section>
@@ -134,7 +134,7 @@
     <input
       [id]="id"
       type="text"
-      [field]="field"
+      [formField]="field"
       (change)="onChange(output[0], output[1], output[2])"
     />
   </section>
