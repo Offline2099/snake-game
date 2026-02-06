@@ -2,7 +2,7 @@
   <defs>
     <radialGradient id="gradient" cx="0" cy="0" gradientTransform="scale(2.5)">
       <stop offset="15%" stop-color="#005555" />
-      <stop offset="50%" stop-color="#006677" />
+      <stop offset="50%" stop-color="#007755" />
       <stop offset="85%" stop-color="#005555" />
     </radialGradient>
     <path id="shape" d="M -2 4 L 0 0 L 2 4" fill="#003333" />
