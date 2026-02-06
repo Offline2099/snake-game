@@ -1,5 +1,5 @@
 import { Component, input, computed, output } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { GameState } from '../../../constants/game/game-state.enum';
 import { Game } from '../../../types/game/game.interface';
 import { Level } from '../../../types/level/level.interface';
@@ -7,7 +7,7 @@ import { SecondsAsTimePipe } from '../../../pipes/seconds-as-time.pipe';
 
 @Component({
   selector: 'app-game-controls',
-  imports: [NgClass,SecondsAsTimePipe],
+  imports: [NgClass, NgTemplateOutlet, SecondsAsTimePipe],
   templateUrl: './game-controls.component.html',
   styleUrl: './game-controls.component.scss',
 })
@@ -25,15 +25,18 @@ export class GameControlsComponent {
   toMenu = output<void>();
 
   isNewBestAttempt = computed<boolean>(() => 
-    this.game().state === GameState.defeat && this.game().progress > this.bestAttempt
+    this.game().state === GameState.defeat 
+      && this.game().progress > this.bestAttempt
   );
   isNewBestTime = computed<boolean>(() => 
-    this.bestAttempt === this.level().settings.goal && // is not the 1st victory
-      this.game().state === GameState.victory && this.game().stats.elapsedTime < this.bestTime
+    this.game().state === GameState.victory 
+      && this.hasWonBefore
+      && this.game().stats.elapsedTime < this.bestTime
   );
 
   bestAttempt: number = 0;
   bestTime: number = 0;
+  hasWonBefore: boolean = false;
 
   ngOnInit(): void {
     this.updateBestScore();
@@ -59,6 +62,7 @@ export class GameControlsComponent {
   updateBestScore(): void {
     this.bestAttempt = this.level().progression.bestProgress;
     this.bestTime = this.level().progression.bestTime;
+    this.hasWonBefore = this.bestAttempt === this.level().settings.goal;
   }
 
 }

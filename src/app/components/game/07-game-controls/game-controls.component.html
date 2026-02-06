@@ -1,17 +1,21 @@
+<!-- Default Panel -->
 @if (game().state === GameState.ready || game().state === GameState.running) {
   <div class="default-buttons">
-    @if (level().progression.bestTime > 0) {
-      <div class="section-line">
-        <ng-container>Best Time: </ng-container>
-        <ng-container>{{ level().progression.bestTime | secondsAsTime }}</ng-container>
-      </div>
+    @if (hasWonBefore) {
+      <ng-template
+        [ngTemplateOutlet]="time"
+        [ngTemplateOutletContext]="{ text: 'Best Time', value: level().progression.bestTime }"
+      />
     } @else {
-      <div class="section-line">
-        <ng-container>Best Attempt: </ng-container>
-        <ng-container>{{ level().progression.bestProgress }}</ng-container>
-        <ng-container>&hairsp;/&hairsp;</ng-container>
-        <ng-container>{{ level().settings.goal }}</ng-container>
-      </div>
+      <ng-template
+        [ngTemplateOutlet]="progress"
+        [ngTemplateOutletContext]="{
+          text: 'Best Attempt',
+          value: game().progress > level().progression.bestProgress 
+            ? game().progress
+            : level().progression.bestProgress
+        }"
+      />
     }
     <button
       type="button"
@@ -28,16 +32,24 @@
   </div>
 }
 
+<!-- Defeat Panel -->
 @if (game().state === GameState.defeat) {
   <div class="controls-overlay defeat">
     <div class="overlay-header">YOU DIED</div>
     @if (isNewBestAttempt()) {
-      <div class="section-line">
-        <ng-container>New best attempt: </ng-container>
-        <ng-container>{{ game().progress }}</ng-container>
-        <ng-container>&hairsp;/&hairsp;</ng-container>
-        <ng-container>{{ level().settings.goal }}</ng-container>
-      </div>
+      <ng-template
+        [ngTemplateOutlet]="progress"
+        [ngTemplateOutletContext]="{ text: 'New Best Attempt', value: game().progress }"
+      />
+    } @else {
+      <ng-template
+        [ngTemplateOutlet]="progress"
+        [ngTemplateOutletContext]="{ text: 'Current Attempt', value: game().progress }"
+      />
+      <ng-template
+        [ngTemplateOutlet]="progress"
+        [ngTemplateOutletContext]="{ text: 'Best Attempt', value: level().progression.bestProgress }"
+      />
     }
     <div class="overlay-buttons">
       <button type="button" (click)="resetGame()">
@@ -53,14 +65,26 @@
   </div>
 }
 
+<!-- Victory Panel -->
 @if (game().state === GameState.victory) {
   <div class="controls-overlay victory">
     <div class="overlay-header">VICTORY</div>
     @if (isNewBestTime()) {
-      <div class="section-line">
-        <ng-container>New best time: </ng-container>
-        <ng-container>{{ game().stats.elapsedTime | secondsAsTime }}</ng-container>
-      </div>
+      <ng-template
+        [ngTemplateOutlet]="time"
+        [ngTemplateOutletContext]="{ text: 'New Best Time', value: game().stats.elapsedTime }"
+      />
+    } @else {
+      @if (hasWonBefore) {
+        <ng-template
+          [ngTemplateOutlet]="time"
+          [ngTemplateOutletContext]="{ text: 'Current Run', value: game().stats.elapsedTime }"
+        />
+        <ng-template
+          [ngTemplateOutlet]="time"
+          [ngTemplateOutletContext]="{ text: 'Best Time', value: level().progression.bestTime }"
+        />
+      }
     }
     <div class="overlay-buttons">
       <button type="button" (click)="resetGame()">
@@ -81,3 +105,21 @@
     </div>
   </div>
 }
+
+<!-- Template: Progress Info Line -->
+<ng-template #progress let-text="text" let-value="value">
+  <div class="section-line">
+    <ng-container>{{ text }}: </ng-container>
+    <ng-container>{{ value }}</ng-container>
+    <ng-container>&hairsp;/&hairsp;</ng-container>
+    <ng-container>{{ level().settings.goal }}</ng-container>
+  </div>
+</ng-template>
+
+<!-- Template: Time Info Line -->
+<ng-template #time let-text="text" let-value="value">
+  <div class="section-line">
+    <ng-container>{{ text }}: </ng-container>
+    <ng-container>{{ value | secondsAsTime }}</ng-container>
+  </div>
+</ng-template>
