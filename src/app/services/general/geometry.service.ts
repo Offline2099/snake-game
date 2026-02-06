@@ -3,6 +3,20 @@ import { Direction } from '../../constants/general/direction.enum';
 import { Position } from '../../types/general/position.interface';
 import { Rectangle } from '../../types/general/rectangle.interface';
 
+const OPPOSITE_DIRECTION_MAP: Record<Direction, Direction> = {
+  [Direction.up]: Direction.down,
+  [Direction.down]: Direction.up,
+  [Direction.left]: Direction.right,
+  [Direction.right]: Direction.left
+};
+
+const SHIFT_MAP: Record<Direction, { x: -1 | 0 | 1, y: -1 | 0 | 1 }> = {
+  [Direction.up]: { x: 0, y: 1 },
+  [Direction.down]: { x: 0, y: -1 },
+  [Direction.left]: { x: -1, y: 0 },
+  [Direction.right]: { x: 1, y: 0 }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,16 +41,7 @@ export class GeometryService {
 
   /** Returns the direction opposite to the specified one. */
   oppositeDirection(direction: Direction): Direction {
-    switch (direction) {
-      case Direction.up:
-        return Direction.down;
-      case Direction.down:
-        return Direction.up;
-      case Direction.left:
-        return Direction.right;
-      case Direction.right:
-        return Direction.left;
-    }
+    return OPPOSITE_DIRECTION_MAP[direction];
   }
 
   /**
@@ -44,22 +49,10 @@ export class GeometryService {
    * direction, relative to the initial position. The default amount is 1.
    */
   shiftPosition(initial: Position, direction: Direction, amount: number = 1): Position {
-    const newPosition: Position = { ...initial };
-    switch (direction) {
-      case Direction.up:
-        newPosition.y += amount;
-        break;
-      case Direction.down:
-        newPosition.y -= amount;
-        break;
-      case Direction.left:
-        newPosition.x -= amount;
-        break;
-      case Direction.right:
-        newPosition.x += amount;
-        break;
+    return {
+      x: initial.x + amount * SHIFT_MAP[direction].x,
+      y: initial.y + amount * SHIFT_MAP[direction].y
     }
-    return newPosition;
   }
 
   /**
