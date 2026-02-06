@@ -2,7 +2,7 @@
   <defs>
     <linearGradient id="gradient" gradientTransform="rotate(90)">
       <stop offset="0" stop-color="#005555" />
-      <stop offset="50%" stop-color="#006677" />
+      <stop offset="50%" stop-color="#007755" />
       <stop offset="100%" stop-color="#005555" />
     </linearGradient>
     <path id="path" d="M 4 2 L 0 4 L 4 6 M 4 8 L 0 10 L 4 12" fill="#003333" />
