@@ -20,6 +20,7 @@ import { EnemyStats } from '../../types/game/stats/enemy-stats.interface';
 // Services
 import { UtilityService } from '../general/utility.service';
 import { SpaceService } from '../space.service';
+import { GameBlockService } from './game-block.service';
 import { GameSpaceService } from './game-space.service';
 
 type EntityType = GameBlockType.enemy | GameBlockType.food;
@@ -45,10 +46,11 @@ export class GameEntityService {
   constructor(
     private utility: UtilityService,
     private spaceService: SpaceService,
+    private gameBlock: GameBlockService,
     private gameSpace: GameSpaceService
   ) {
-    this.foodTypes = Object.values(FoodType).filter(Number) as FoodType[];
-    this.enemyTypes = Object.values(EnemyType).filter(Number) as EnemyType[];
+    this.foodTypes = this.gameBlock.allFoodTypes();
+    this.enemyTypes = this.gameBlock.allEnemyTypes();
   }
 
   //===========================================================================
@@ -165,8 +167,12 @@ export class GameEntityService {
   //===========================================================================
 
   private countInitialEntities(level: Level, entity: Entity): number {
-    return level.settings.entities.reduce((acc, data) => {
-      acc += data.block.type === entity.type  && data.block.subType === entity.subType ? 1 : 0;
+    if (!level.settings.map?.entities) return 0;
+    return Object.values(level.settings.map.entities).reduce((acc, x) => {
+      acc += Object.values(x).reduce((accX, data) => {
+        accX += this.gameBlock.areBlocksEqual(data, entity) ? 1 : 0;
+        return accX;
+      }, 0);
       return acc;
     }, 0);
   }
@@ -177,7 +183,7 @@ export class GameEntityService {
         this.spaceService.availableSpace(game.space, this.spaceExclusionMatch[entity.type]);
       if (!availablePositions.length) return;
       const position: Position = this.utility.randomFromArray(availablePositions);
-      const food: GameBlockData = this.spaceService.createBlock(entity.type, entity.subType);
+      const food: GameBlockData = this.gameBlock.createBlock(entity.type, entity.subType);
       this.spaceService.setBlock(game.space, position, food);
       this.gameSpace.protectEntity(game, level, position, entity.type);
       this.recordEntitySpawn(game, entity);

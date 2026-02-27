@@ -1,0 +1,304 @@
+<!-- Cursor Position -->
+<div class="tooltip-section">
+  <div class="tooltip-line">
+    <span>x&hairsp;:&nbsp;</span>
+    <span class="value">{{ cursor().x }}</span>
+    <span>, y&hairsp;:&nbsp;</span>
+    <span class="value">{{ cursor().y }}</span>
+  </div>
+</div>
+
+<!-- Block Under Cursor -->
+<div class="tooltip-section">
+  <div class="tooltip-line">
+    @if (blockUnderCursor(); as block) {
+      <app-asset-block [type]="block.type" [subType]="block.subType" />
+      <span>&nbsp;{{ block.name }}</span>
+    } @else { 
+      <ng-container>Empty block</ng-container>
+    }
+  </div>
+</div>
+
+<!-- Area Under Cursor -->
+@if (areaUnderCursor(); as area) {
+  <div class="tooltip-section">
+    <div class="tooltip-line">
+      <b>Area of&nbsp;</b>
+      <app-asset-block [type]="area.block.type" [subType]="area.block.subType" />
+      <span>
+        <ng-container>&nbsp;(&hairsp;</ng-container>
+        <ng-container>{{ area.rectangle.bottomRight.x - area.rectangle.topLeft.x + 1 }}</ng-container>
+        <ng-container>&nbsp;by&nbsp;</ng-container>
+        <ng-container>{{ area.rectangle.topLeft.y - area.rectangle.bottomRight.y + 1 }}</ng-container>
+        <ng-container>&hairsp;)</ng-container>
+      </span>
+    </div>
+    <div class="tooltip-line">
+      <ng-template
+        [ngTemplateOutlet]="position"
+        [ngTemplateOutletContext]="{ text: 'Top left', position: area.rectangle.topLeft }"
+      />
+    </div>
+    <div class="tooltip-line">
+      <ng-template
+        [ngTemplateOutlet]="position"
+        [ngTemplateOutletContext]="{ text: 'Bottom right', position: area.rectangle.bottomRight }"
+      />
+    </div>
+    <ng-template [ngTemplateOutlet]="areaData" [ngTemplateOutletContext]="{ area }" />
+  </div>
+}
+
+<!-- Wall Under Cursor -->
+@if (wallUnderCursor(); as wall) {
+  <div class="tooltip-section">
+    <div class="tooltip-line">
+      <b>{{ wall.orientaion }} Wall</b>
+    </div>
+    <div class="tooltip-line">
+      <ng-template
+        [ngTemplateOutlet]="position"
+        [ngTemplateOutletContext]="{ text: 'Start', position: wall.rectangle.topLeft }"
+      />
+      @if (wall.noStartBlock) {
+        <span>, no start block</span>
+      }
+    </div>
+    <div class="tooltip-line">
+      <ng-template
+        [ngTemplateOutlet]="position"
+        [ngTemplateOutletContext]="{ text: 'End', position: wall.rectangle.bottomRight }"
+      />
+      @if (wall.noEndBlock) {
+        <span>, no end block</span>
+      }
+    </div>
+    <div class="tooltip-line">
+      <span>Length&hairsp;:&nbsp;</span>
+      <span class="value">{{ wall.length }}</span>
+      <span>&nbsp;blocks</span>
+    </div>
+    <ng-template [ngTemplateOutlet]="areaData" [ngTemplateOutletContext]="{ area: wall }" />
+  </div>
+}
+
+<!-- Portal Under Cursor -->
+@if (portalsUnderCursor(); as portals) {
+  <div class="tooltip-section">
+    <div class="tooltip-line">
+      @if (portals.length > 1) {
+        <b>Portals</b>
+        <span>&nbsp;(&hairsp;{{ portals.length }} with same exit&hairsp;)&nbsp;</span>
+      } @else {
+        <b>Portal</b>
+      }      
+    </div>
+    <div class="tooltip-line" [ngClass]="{ 'wrap': portals.length > 6 }">
+      @if (portals.length > 1) {
+        <span>Entrances&hairsp;:&nbsp;</span>
+      } @else {
+        <span>Entrance&hairsp;:&nbsp;</span>
+      }
+      @for (portal of portals; track portal.entrance) {
+        <span>
+          <ng-template
+            [ngTemplateOutlet]="position"
+            [ngTemplateOutletContext]="{ position: portal.entrance }"
+          />
+          @if (!$last) {
+            <span>,&nbsp;</span>
+          }
+        </span>
+      }      
+    </div>
+    <div class="tooltip-line">
+      <span>Exit&hairsp;:&nbsp;</span>
+      <ng-template
+        [ngTemplateOutlet]="position"
+        [ngTemplateOutletContext]="{ position: portals[0].exit }"
+      />
+    </div>
+  </div>
+}
+
+<!-- Available Actions -->
+<div class="tooltip-section">
+  @if (asset(); as asset) {
+    @switch (mode()) {
+      @case (Mode.single) {
+        @if (blockUnderCursor(); as block) {
+          @if (asset.type !== block.type || asset.subType !== block.subType) {
+            <ng-template 
+              [ngTemplateOutlet]="action"
+              [ngTemplateOutletContext]="{ key: LMB, text: 'Replace block with ', block: asset }"
+            />
+          }
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: RMB, text: 'Delete ', block }"
+          />
+        } @else {
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: LMB, text: 'Place new ', block: asset }"
+          />
+        }
+      }
+      @case (Mode.area) {
+        @if (isActionInProgress()) {
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: LMB, text: 'Confirm area of ', block: asset }"
+          />
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: RMB, text: 'Cancel area of ', block: asset }"
+          />
+        } @else {
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: LMB, text: 'Start new area of ', block: asset }"
+          />
+          @if (blockUnderCursor(); as block) {
+            <ng-template 
+              [ngTemplateOutlet]="action"
+              [ngTemplateOutletContext]="{ key: RMB, text: 'Delete ', block }"
+            />
+          }
+        }
+      }
+      @case (Mode.wall) {
+        @if (isActionInProgress()) {
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: LMB, text: 'Confirm wall' }"
+          />
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: RMB, text: 'Cancel wall' }"
+          />
+        } @else {
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: LMB, text: 'Start new wall' }"
+          />
+          @if (blockUnderCursor(); as block) {
+            <ng-template 
+              [ngTemplateOutlet]="action"
+              [ngTemplateOutletContext]="{ key: RMB, text: 'Delete ', block }"
+            />
+          }
+        }
+      }
+      @case (Mode.portal) {
+        @if (isActionInProgress()) {
+          @if (blockUnderCursor(); as block) {
+            @if (!(block.type === GameBlockType.portal && block.subType === PortalType.exit)) {
+              <ng-template 
+                [ngTemplateOutlet]="action"
+                [ngTemplateOutletContext]="{ key: LMB, text: 'Replace block with ', block: asset }"
+              />
+            } @else {
+              <ng-template 
+                [ngTemplateOutlet]="action"
+                [ngTemplateOutletContext]="{ key: LMB, text: 'Place new ', block: asset }"
+              />
+            }            
+          } @else {
+            <ng-template 
+              [ngTemplateOutlet]="action"
+              [ngTemplateOutletContext]="{ key: LMB, text: 'Place new ', block: asset }"
+            />
+          }
+          <ng-template 
+            [ngTemplateOutlet]="action"
+            [ngTemplateOutletContext]="{ key: RMB, text: 'Cancel portal' }"
+          />
+        } @else {
+          @if (blockUnderCursor(); as block) {
+            <ng-template 
+              [ngTemplateOutlet]="action"
+              [ngTemplateOutletContext]="{ key: LMB, text: 'Replace block with ', block: asset }"
+            />
+            <ng-template 
+              [ngTemplateOutlet]="action"
+              [ngTemplateOutletContext]="{ key: RMB, text: 'Delete ', block }"
+            />
+          } @else {
+            <ng-template 
+              [ngTemplateOutlet]="action"
+              [ngTemplateOutletContext]="{ key: LMB, text: 'Place new ', block: asset }"
+            />
+          }      
+        }          
+      }
+    }
+  } @else {
+    <div class="tooltip-line">Select an asset to place on the map.</div>
+  }
+</div>
+
+<!-- Template: Position -->
+<ng-template #position let-text="text" let-position="position">
+  @if (text) {
+    <span>{{ text }}&hairsp;:&nbsp;</span>
+  }  
+  <span class="value">(&hairsp;{{ position.x }}, {{ position.y }}&hairsp;)</span> 
+</ng-template>
+
+<!-- Template: Action -->
+<ng-template #action let-key="key" let-text="text" let-block="block">
+  <div class="tooltip-line">
+    <b>{{ key }}&hairsp;:&nbsp;</b>
+    @if (text) {
+      <span>{{ text }}&thinsp;</span>
+    }
+    @if (block) {
+      <app-asset-block [type]="block.type" [subType]="block.subType" />
+    }    
+  </div>
+</ng-template>
+
+<!-- Template: Area Data -->
+<ng-template #areaData let-area="area">
+  @if (area.excludePositions) {
+    <div class="tooltip-line" [ngClass]="{ 'wrap': area.excludePositions.length > 4 }">
+      <span>Excluded positions&hairsp;:&nbsp;</span>
+      @for (excluded of area.excludePositions; track $index) {
+        <span>
+          <ng-template
+            [ngTemplateOutlet]="position"
+            [ngTemplateOutletContext]="{ position: excluded }"
+          />
+          @if (!$last) {
+            <span>,&nbsp;</span>
+          }
+        </span>
+      }
+    </div>
+  }
+  @if (area.excludeRectangles) {
+    <div class="tooltip-line" [ngClass]="{ 'wrap': area.excludeRectangles.length > 2 }">
+      <span>Excluded areas&hairsp;:&nbsp;</span>
+      @for (excluded of area.excludeRectangles; track $index) {
+        <span>
+          <span>[&hairsp;</span>
+          <ng-template
+            [ngTemplateOutlet]="position"
+            [ngTemplateOutletContext]="{ position: excluded.topLeft }"
+          />
+          <span>...</span>
+          <ng-template
+            [ngTemplateOutlet]="position"
+            [ngTemplateOutletContext]="{ position: excluded.bottomRight }"
+          />
+          <span>&hairsp;]</span>
+          @if (!$last) {
+            <span>,&nbsp;</span>
+          }
+        </span>
+      }
+    </div>
+  }
+</ng-template>

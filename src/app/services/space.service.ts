@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { DEFAULT_GAME_BLOCK } from '../constants/game/delault-game-block';
 import { GameBlockType } from '../constants/game/game-block-type.enum';
 import { ProtectionType } from '../constants/game/protection-type.enum';
-import { PortalType } from '../constants/portals/portal-type.enum';
 import { FoodType } from '../constants/food/food-type.enum';
 import { EnemyType } from '../constants/enemies/enemy-type.enum';
 // Interfaces & Types
@@ -11,17 +9,17 @@ import { Position } from '../types/general/position.interface';
 import { Rectangle } from '../types/general/rectangle.interface';
 import { GameBlockData } from '../types/game/space/game-block-data.interface';
 import { Space } from '../types/game/space/space.type';
-import { Protection } from '../types/game/space/protection.type';
 import { GameBlockSubType } from '../types/game/space/game-block-subtype.type';
 // Services
 import { GeometryService } from './general/geometry.service';
+import { GameBlockService } from './game/game-block.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpaceService {
 
-  constructor(private geometry: GeometryService) {}
+  constructor(private geometry: GeometryService, private gameBlock: GameBlockService) {}
 
   //===========================================================================
   //  Space Construction
@@ -30,34 +28,8 @@ export class SpaceService {
   createSpace(sizeX: number, sizeY: number): Space {
     return Array.from(
       { length: sizeX },
-      () => Array.from({ length: sizeY }, () => this.defaultBlock())
+      () => Array.from({ length: sizeY }, () => this.gameBlock.defaultBlock())
     );
-  }
-
-  defaultBlock(): GameBlockData {
-    return {
-      ...DEFAULT_GAME_BLOCK,
-      isProtected: { ...DEFAULT_GAME_BLOCK.isProtected }
-    }
-  }
-
-  createBlock(type: GameBlockType, subType?: GameBlockSubType, protection?: Protection): GameBlockData {
-    return {
-      type,
-      subType,
-      isProtected: protection ? { ...protection } : { ...DEFAULT_GAME_BLOCK.isProtected }
-    }
-  }
-
-  createPortalBlock(portalType: PortalType): GameBlockData {
-    return {
-      type: GameBlockType.portal,
-      subType: portalType,
-      isProtected: {
-        [ProtectionType.noEnemySpawn]: true,
-        [ProtectionType.noFoodSpawn]: true
-      }
-    }
   }
 
   //===========================================================================

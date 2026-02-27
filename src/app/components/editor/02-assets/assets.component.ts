@@ -1,19 +1,18 @@
-import { Component, model } from '@angular/core';
+import { Component, computed, model } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
-import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode-id.enum';
-import { ASSET_PLACING_MODES } from '../../../constants/editor/asset-placing-modes';
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { GameBlockSubType } from '../../../types/game/space/game-block-subtype.type';
-import { DEFAULT_GAME_BLOCK } from '../../../constants/game/delault-game-block';
+import { Orientation } from '../../../constants/general/orientation.enum';
+import { AssetPlacingModeId as Mode } from '../../../constants/editor/asset-placing-mode-id.enum';
+import { ASSET_PLACING_MODE_LIST } from '../../../constants/editor/asset-placing-modes';
+import { GameBlockType as AssetType } from '../../../constants/game/game-block-type.enum';
 import { ObstacleType } from '../../../constants/obstacles/obstacle-type.enum';
-import { PortalType } from '../../../constants/portals/portal-type.enum';
-import { ENEMY_DATA } from '../../../constants/enemies/enemy-data';
-import { FOOD_DATA } from '../../../constants/food/food-data';
 // Interfaces & Types
-import { GameBlockData } from '../../../types/game/space/game-block-data.interface';
+import { GameBlockBase } from '../../../types/game/space/game-block-base.interface';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
+// Services
+import { WallService } from '../../../services/level/wall.service';
+import { GameBlockService } from '../../../services/game/game-block.service';
 
 @Component({
   selector: 'app-assets',
@@ -23,42 +22,51 @@ import { AssetBlockComponent } from '../../shared/asset-block/asset-block.compon
 })
 export class AssetsComponent {
 
-  readonly ASSET_PLACING_MODES = ASSET_PLACING_MODES;
+  readonly Orientation = Orientation;
+  readonly MODE_LIST = ASSET_PLACING_MODE_LIST;
+  readonly AssetType = AssetType;
+  readonly ObstacleType = ObstacleType;
 
-  selectedAsset = model.required<GameBlockData | null>();
-  selectedModeId= model.required<AssetPlacingModeId>();
+  selectedAsset = model.required<GameBlockBase>();
+  selectedMode = model.required<Mode>();
+  previousMode = model.required<Mode>();
 
-  obstacles: GameBlockData[] = Object.values(ObstacleType).filter(Number)
-    .map(obstacleType => this.gameBlockData(GameBlockType.obstacle, Number(obstacleType)));
+  isButtonActive = computed<boolean>(() => 
+    this.selectedMode() === Mode.wall || this.selectedMode() === Mode.portal
+  );
 
-  enemies: GameBlockData[] = Object.keys(ENEMY_DATA)
-    .map(enemyType => this.gameBlockData(GameBlockType.enemy, Number(enemyType)));
+  obstacles: GameBlockBase[];
+  enemies: GameBlockBase[];
+  food: GameBlockBase[];
 
-  food: GameBlockData[] = Object.keys(FOOD_DATA)
-    .map(foodType => this.gameBlockData(GameBlockType.food, Number(foodType)));
-
-  gameBlockData(type: GameBlockType, subType: GameBlockSubType): GameBlockData {
-    return {
-      type, subType, isProtected: { ...DEFAULT_GAME_BLOCK.isProtected }
-    }
+  constructor(private gameBlock: GameBlockService, private wallService: WallService) {
+    this.obstacles = this.gameBlock.allObstacles();
+    this.enemies = this.gameBlock.allEnemies();
+    this.food = this.gameBlock.allFood();
   }
 
-  selectAsset(asset: GameBlockData): void {
-    this.selectedAsset.set(asset);    
+  selectAsset(asset: GameBlockBase): void {
+    this.selectedAsset.set({ ...asset });
   }
 
-  selectMode(modeId: AssetPlacingModeId): void {
-    this.selectedModeId.set(modeId);
+  selectMode(modeId: Mode): void {
+    if (!this.isButtonActive()) this.previousMode.set(this.selectedMode());
+    this.selectedMode.set(modeId);
+  }
+
+  pickAsset(asset: GameBlockBase): void {
+    if (this.isButtonActive()) this.selectedMode.set(this.previousMode());
+    this.selectAsset(asset);
+  }
+
+  addWall(orientation: Orientation): void {
+    this.selectAsset(this.wallService.bodyBlock(orientation));
+    this.selectMode(Mode.wall);
   }
 
   addPortal(): void {
-    this.selectedAsset.set({
-      type: GameBlockType.portal,
-      subType: PortalType.entrance,
-      portalTo: { x: -1, y: -1 },
-      isProtected: { ...DEFAULT_GAME_BLOCK.isProtected }
-    });
-    this.selectMode(AssetPlacingModeId.portal);
+    this.selectAsset(this.gameBlock.portalEntrance());
+    this.selectMode(Mode.portal);
   }
 
 }

@@ -27,26 +27,20 @@ $ruler-padding: 2px;
     height: $game-block-size;
     color: $text-normal;
     font-size: 11px;
+    &.match {
+      background-color: $bg-medium;
+      color: $text-selected;
+      font-weight: 600;
+      text-shadow: 1px 1px $shadow-dark;
+    }
   }
 }
 
-.position-tracker {
-  position: absolute;
-  padding: 2px 5px;
-  border: 1px solid $border-normal;
-  border-radius: 4px;
-  background-color: $bg-button;
-  color: $text-normal;
-  font-size: 14px;
-  white-space: nowrap;
-  &.invisible {
-    display: none;
-  }
-  @include hover {
-    display: none;
+app-asset-block {
+  animation: grow .2s;
+  &.temporary {
+    opacity: .5;
+    animation: none;
   }
 }
 
-.temporary {
-  opacity: .5;
-}

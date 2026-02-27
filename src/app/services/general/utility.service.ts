@@ -15,4 +15,9 @@ export class UtilityService {
     return array[this.randomInteger(0, array.length - 1)];
   }
 
+  /** Returns whether a given object is empty. */
+  isEmptyObject(obj: object): boolean {
+    return Object.keys(obj).length === 0;
+  }
+
 }

@@ -17,6 +17,7 @@ import { GeometryService } from '../general/geometry.service';
 import { SpaceService } from '../space.service';
 import { GameSpaceService } from './game-space.service';
 import { SnakeService } from '../snake.service';
+import { GameBlockService } from './game-block.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ export class GameSnakeService {
   constructor(
     private geometry: GeometryService,
     private spaceService: SpaceService,
+    private gameBlock: GameBlockService,
     private gameSpace: GameSpaceService,
     private snakeService: SnakeService
   ) {}
@@ -49,21 +51,21 @@ export class GameSnakeService {
 
   private setSnakeHead(space: Space, snake: Snake): void {
     const head: GameBlockData = 
-      this.spaceService.createBlock(GameBlockType.snakeHead, snake.head.currentDirection);
+      this.gameBlock.createBlock(GameBlockType.snakeHead, snake.head.currentDirection);
     this.setSnakeBlock(space, snake.head.currentPosition, head);
   }
 
   private setSnakeBody(space: Space, snake: Snake): void {
     snake.body.forEach(block => {
       const blockData: GameBlockData = 
-        this.spaceService.createBlock(GameBlockType.snakeBody, block.type);
+        this.gameBlock.createBlock(GameBlockType.snakeBody, block.type);
       this.setSnakeBlock(space, block.currentPosition, blockData);
     });
   }
 
   private setSnakeTail(space: Space, snake: Snake): void {
     const tail: GameBlockData = 
-      this.spaceService.createBlock(GameBlockType.snakeTail, snake.tail.currentDirection);
+      this.gameBlock.createBlock(GameBlockType.snakeTail, snake.tail.currentDirection);
     this.setSnakeBlock(space, snake.tail.currentPosition, tail);
   }
 

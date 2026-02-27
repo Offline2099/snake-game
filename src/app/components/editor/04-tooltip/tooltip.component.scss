@@ -1,0 +1,62 @@
+@use '../../../../scss' as *;
+
+:host {
+  position: absolute;
+  max-width: 450px;
+  padding: 2px 5px;
+  border: 1px solid $border-normal;
+  border-radius: 4px;
+  background-color: $bg-medium;
+  @include hover {
+    display: none;
+  }
+}
+
+.tooltip-section {
+  display: flex;
+  flex-direction: column;
+  padding: 3px 0;
+  border-bottom: 1px solid $border-normal;  
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.tooltip-line {
+  display: flex;
+  align-items: center;
+  color: $text-normal;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: .03em;
+  white-space: nowrap;
+  text-shadow: 1px 1px $shadow-dark;
+  &.wrap {
+    width: 440px;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+}
+
+span {
+  white-space: nowrap;
+}
+
+.value {
+  color: $text-selected;
+  text-align: right;
+  font-weight: 500;
+}
+
+b {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+app-asset-block {
+  display: inline-flex;
+  width: 15px;
+  height: 15px;
+  margin-bottom: 2px;
+  animation: none;
+}

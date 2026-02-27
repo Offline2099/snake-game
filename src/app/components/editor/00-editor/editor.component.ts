@@ -5,12 +5,13 @@ import { EditorTabId } from '../../../constants/editor/editor-tab-id.enum';
 import { EditorInputId } from '../../../constants/editor/editor-input-id.enum';
 import { EDITOR_TABS } from '../../../constants/editor/editor-tabs';
 import { DEFAULT_LEVEL_DATA } from '../../../constants/level/default-level-settings';
+import { DEFAULT_SELECTED_ASSET } from '../../../constants/editor/default-selected-asset';
 import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode-id.enum';
 import { EDITOR_BG_HUE } from '../../../constants/backgrounds';
 // Interfaces & Types
 import { EditorTab } from '../../../types/editor/editor-tab.interface';
 import { LevelData } from '../../../types/level/level-data.interface';
-import { GameBlockData } from '../../../types/game/space/game-block-data.interface';
+import { GameBlockBase } from '../../../types/game/space/game-block-base.interface';
 // Components
 import { BackgroundComponent } from '../../shared/background/background.component';
 import { AreaComponent } from '../01-area/area.component';
@@ -18,6 +19,7 @@ import { AssetsComponent } from '../02-assets/assets.component';
 import { PropertiesComponent } from '../03-properties/properties.component';
 // Services
 import { FileService } from '../../../services/general/file.service';
+
 
 @Component({
   selector: 'app-editor',
@@ -34,8 +36,9 @@ export class EditorComponent {
 
   level = signal<LevelData>({ ...DEFAULT_LEVEL_DATA });
   selectedTabId: EditorTabId = EditorTabId.assets;
-  selectedAsset: GameBlockData | null = null;
-  selectedModeId: AssetPlacingModeId = AssetPlacingModeId.single;
+  selectedAsset: GameBlockBase = { ...DEFAULT_SELECTED_ASSET };
+  selectedMode: AssetPlacingModeId = AssetPlacingModeId.single;
+  previousMode: AssetPlacingModeId = AssetPlacingModeId.single;
 
   constructor(private container: ElementRef, private fileService: FileService) {}
 

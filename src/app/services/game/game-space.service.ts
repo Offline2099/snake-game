@@ -14,6 +14,7 @@ import { Protection } from '../../types/game/space/protection.type';
 // Services
 import { GeometryService } from '../general/geometry.service';
 import { SpaceService } from '../space.service';
+import { GameBlockService } from './game-block.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,11 @@ export class GameSpaceService {
   private readonly protectionTypes: ProtectionType[];
   private readonly entityTypes: GameBlockType[];
 
-  constructor(private geometry: GeometryService, private spaceService: SpaceService) {
+  constructor(
+    private geometry: GeometryService,
+    private spaceService: SpaceService,
+    private gameBlock: GameBlockService
+  ) {
     this.protectionTypes = Object.values(ProtectionType).filter(Number) as ProtectionType[];
     this.entityTypes = 
       [GameBlockType.obstacle, GameBlockType.portal, GameBlockType.enemy, GameBlockType.food];
@@ -92,7 +97,7 @@ export class GameSpaceService {
       game.space,
       position, 
       { 
-        ...this.spaceService.defaultBlock(),
+        ...this.gameBlock.defaultBlock(),
         isProtected: { ...this.freeBlockProtection(game, level, position) }
       }
     );
@@ -101,13 +106,13 @@ export class GameSpaceService {
   private restorePortalExit(game: Game, position: Position): boolean {
     if (!game.portals.find(portal => this.geometry.isSamePosition(position, portal.exit))) 
       return false;
-    const block: GameBlockData = this.spaceService.createPortalBlock(PortalType.exit);
+    const block: GameBlockData = this.gameBlock.createPortalBlock(PortalType.exit);
     this.spaceService.setBlock(game.space, position, block);
     return true;
   }
 
   private freeBlockProtection(game: Game, level: Level, position: Position): Protection {
-    const protection: Protection = this.spaceService.defaultBlock().isProtected;
+    const protection: Protection = this.gameBlock.defaultBlock().isProtected;
     const space: Rectangle = this.spaceService.toRectangle(game.space);
     this.protectionTypes.forEach(protectionType => {
       const perimeterMargin: number = level.settings.perimeterProtection[protectionType];

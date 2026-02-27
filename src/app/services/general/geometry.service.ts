@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Direction } from '../../constants/general/direction.enum';
 import { Position } from '../../types/general/position.interface';
 import { Rectangle } from '../../types/general/rectangle.interface';
+import { Portal } from '../../types/general/portal.interface';
 
 const OPPOSITE_DIRECTION_MAP: Record<Direction, Direction> = {
   [Direction.up]: Direction.down,
@@ -80,6 +81,11 @@ export class GeometryService {
       || position.y > rectangle.topLeft.y;
   }
 
+  /** Checks if a given position is within the specified rectangle. */
+  isWithinRectangle(rectangle: Rectangle, position: Position): boolean {
+    return !this.isOutsideRectangle(rectangle, position);
+  }
+
   /** 
    * Checks if a given position is near the perimeter of a specified rectangle
    * within a given margin.
@@ -113,6 +119,58 @@ export class GeometryService {
       }
     }
     return positions;
+  }
+
+  isSingleBlock(rectangle: Rectangle): boolean {
+    return this.isSamePosition(rectangle.topLeft, rectangle.bottomRight);
+  }
+
+  isSameRectangle(a: Rectangle, b: Rectangle): boolean {
+    return this.isSamePosition(a.topLeft, b.topLeft)
+      && this.isSamePosition(a.bottomRight, b.bottomRight);
+  }
+
+  isRectangleWithinAnother(outer: Rectangle, inner: Rectangle): boolean {
+    return !this.isOutsideRectangle(outer, inner.topLeft)
+      && !this.isOutsideRectangle(outer, inner.bottomRight);
+  }
+
+  rectangleFromIntersection(a: Rectangle, b: Rectangle): Rectangle | null {
+    const left = Math.max(a.topLeft.x, b.topLeft.x);
+    const right = Math.min(a.bottomRight.x, b.bottomRight.x);
+    const top = Math.min(a.topLeft.y, b.topLeft.y);
+    const bottom = Math.max(a.bottomRight.y, b.bottomRight.y);
+    return left <= right && bottom <= top
+      ? {
+          topLeft: { x: left, y: top },
+          bottomRight: { x: right, y: bottom }
+        }
+      : null;
+  }
+
+  rectangleFromPositions(positions: Position[]): Rectangle | null {
+    if (positions.length === 0) return null;
+    let left: number = Number.MAX_SAFE_INTEGER;
+    let right: number = Number.MIN_SAFE_INTEGER;
+    let top: number = Number.MIN_SAFE_INTEGER;
+    let bottom: number = Number.MAX_SAFE_INTEGER;
+    positions.forEach(position => {
+      left = Math.min(left, position.x);
+      right = Math.max(right, position.x);
+      top = Math.max(top, position.y);
+      bottom = Math.min(bottom, position.y);
+    });
+    return positions.length === (right - left + 1) * (top - bottom + 1)
+      ? { 
+          topLeft: { x: left, y: top }, 
+          bottomRight: { x: right, y: bottom }
+        }
+      : null;
+  }
+
+  isSamePortal(a: Portal, b: Portal): boolean {
+    return this.isSamePosition(a.entrance, b.entrance)
+      && this.isSamePosition(a.exit, b.exit);
   }
 
 }

@@ -13,13 +13,18 @@ import { Position } from '../../types/general/position.interface';
 import { Game } from '../../types/game/game.interface';
 import { Level } from '../../types/level/level.interface';
 import { Snake } from '../../types/snake/snake.interface.ts';
+import { GameBlockBase } from '../../types/game/space/game-block-base.interface';
+import { GameBlockData } from '../../types/game/space/game-block-data.interface';
 // Services
 import { SpaceService } from '../space.service';
 import { SnakeService } from '../snake.service';
 import { GeometryService } from '../general/geometry.service';
+import { GameBlockService } from './game-block.service';
 import { GameSnakeService } from './game-snake.service';
 import { GameEntityService } from './game-entity.service';
 import { GameSpaceService } from './game-space.service';
+import { AreaService } from '../level/area.service';
+import { WallService } from '../level/wall.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,9 +35,12 @@ export class GameService {
     private geometry: GeometryService,
     private spaceService: SpaceService,
     private snakeService: SnakeService,
+    private gameBlock: GameBlockService,
     private gameSpace: GameSpaceService,
     private gameSnake: GameSnakeService,
-    private gameEntity: GameEntityService
+    private gameEntity: GameEntityService,
+    private areaService: AreaService,
+    private wallService: WallService
   ) {}
 
   //===========================================================================
@@ -58,7 +66,7 @@ export class GameService {
       portals: [],
       delayedGrowth: 0
     }
-    this.setInitialEntities(game, level);
+    this.setMap(game, level);
     this.gameSpace.protectPerimeterMargin(game, level);
     this.gameSnake.setSnake(game.space, snake);    
     this.gameEntity.spawnInitialEnemies(game, level);
@@ -66,13 +74,55 @@ export class GameService {
     return game;
   }
 
-  private setInitialEntities(game: Game, level: Level): void {
-    level.settings.entities.forEach(entity => {
-      this.spaceService.setBlock(game.space, entity.position, entity.block);
-      this.gameSpace.protectEntity(game, level, entity.position, entity.block.type);
-      if (entity.block.type === GameBlockType.portal && entity.block.portalTo)
-        game.portals.push({ entrance: entity.position, exit: entity.block.portalTo });
+  private setMap(game: Game, level: Level): void {
+    if (!level.settings.map) return;
+    this.setMapEntities(game, level);
+    this.setMapAreas(game, level);
+    this.setWalls(game, level);
+    this.setPortals(game, level);
+  }
+
+  private setMapEntities(game: Game, level: Level): void {
+    if (!level.settings.map?.entities) return;
+    Object.entries(level.settings.map.entities).forEach(([x, value]) => 
+      Object.entries(value).forEach(([y, block]) => {
+        const position: Position = { x: Number(x), y: Number(y) };
+        this.setMapBlock(game, level, position, block);
+      })
+    );
+  }
+
+  private setMapAreas(game: Game, level: Level): void {
+    if (!level.settings.map?.areas) return;
+    level.settings.map.areas.forEach(area => 
+      this.areaService.includedPositions(area).forEach(position => 
+        this.setMapBlock(game, level, position, area.block)
+      )
+    );
+  }
+
+  private setWalls(game: Game, level: Level): void {
+    if (!level.settings.map?.walls) return;
+    level.settings.map.walls.forEach(wall => 
+      this.areaService.includedPositions(wall).forEach(position => 
+        this.setMapBlock(game, level, position, this.wallService.currentBlock(wall, position))
+      )
+    );
+  }
+
+  private setPortals(game: Game, level: Level): void {
+    if (!level.settings.map?.portals) return;
+    level.settings.map.portals.forEach(portal => {
+      this.setMapBlock(game, level, portal.entrance, this.gameBlock.portalEntrance(portal.exit));
+      this.setMapBlock(game, level, portal.exit, this.gameBlock.portalExit());
     });
+  }
+
+  private setMapBlock(game: Game, level: Level, position: Position, block: GameBlockBase): void {
+    this.spaceService.setBlock(game.space, position, block as GameBlockData);
+    this.gameSpace.protectEntity(game, level, position, block.type);
+    if (block.type === GameBlockType.portal && block.portalTo)
+      game.portals.push({ entrance: position, exit: block.portalTo });
   }
 
   //===========================================================================
