@@ -18,7 +18,6 @@ import { Level } from '../../types/level/level.interface';
 import { FoodStats } from '../../types/game/stats/food-stats.interface';
 import { EnemyStats } from '../../types/game/stats/enemy-stats.interface';
 // Services
-import { UtilityService } from '../general/utility.service';
 import { SpaceService } from '../space.service';
 import { GameBlockService } from './game-block.service';
 import { GameSpaceService } from './game-space.service';
@@ -44,7 +43,6 @@ export class GameEntityService {
   }
 
   constructor(
-    private utility: UtilityService,
     private spaceService: SpaceService,
     private gameBlock: GameBlockService,
     private gameSpace: GameSpaceService
@@ -134,9 +132,8 @@ export class GameEntityService {
     enemyType: EnemyType,
     snakeHealth: number
   ): void {
-    const damage: number = ENEMY_DATA[enemyType].damage;
     this.recordEnemyInteraction(game, level, enemyType);
-    if (damage >= snakeHealth) {
+    if (ENEMY_DATA[enemyType].damage >= snakeHealth) {
       game.state = GameState.defeat;
       return;
     }
@@ -179,10 +176,9 @@ export class GameEntityService {
 
   private spawnEntities(game: Game, level: Level, entity: Entity, amount: number): void {
     [...Array(amount)].forEach(() => {
-      const availablePositions: Position[] = 
-        this.spaceService.availableSpace(game.space, this.spaceExclusionMatch[entity.type]);
-      if (!availablePositions.length) return;
-      const position: Position = this.utility.randomFromArray(availablePositions);
+      const position: Position | null = 
+        this.spaceService.randomFreePosition(game.space, this.spaceExclusionMatch[entity.type]);
+      if (!position) return;
       const food: GameBlockData = this.gameBlock.createBlock(entity.type, entity.subType);
       this.spaceService.setBlock(game.space, position, food);
       this.gameSpace.protectEntity(game, level, position, entity.type);

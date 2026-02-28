@@ -11,15 +11,22 @@ import { GameBlockData } from '../types/game/space/game-block-data.interface';
 import { Space } from '../types/game/space/space.type';
 import { GameBlockSubType } from '../types/game/space/game-block-subtype.type';
 // Services
+import { UtilityService } from './general/utility.service';
 import { GeometryService } from './general/geometry.service';
 import { GameBlockService } from './game/game-block.service';
+
+const RANDOM_GUESS_ATTEMPTS: number = 10;
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpaceService {
 
-  constructor(private geometry: GeometryService, private gameBlock: GameBlockService) {}
+  constructor(
+    private utility: UtilityService,
+    private geometry: GeometryService,
+    private gameBlock: GameBlockService
+  ) { }
 
   //===========================================================================
   //  Space Construction
@@ -65,13 +72,29 @@ export class SpaceService {
     return subType 
       ? block.type === type && block.subType === subType
       : block.type === type;
-  } 
+  }
 
-  availableSpace(space: Space, typeToExclude: ProtectionType): Position[] {
+  randomFreePosition(space: Space, typeToExclude: ProtectionType): Position | null {
+    let position: Position | null = null;
+    for (let attempt = 0; attempt < RANDOM_GUESS_ATTEMPTS; attempt++) {
+      position = {
+        x: this.utility.randomInteger(0, space.length - 1),
+        y: this.utility.randomInteger(0, space[0].length - 1)
+      };
+      const block: GameBlockData = this.getBlock(space, position);
+      if (block.type === GameBlockType.free && !block.isProtected[typeToExclude]) break;
+      else position = null;
+    }
+    if (position) return position;
+    const availablePositions: Position[] = this.availableSpace(space, typeToExclude);
+    if (!availablePositions.length) return null;
+    return this.utility.randomFromArray(availablePositions);
+  }
+
+  private availableSpace(space: Space, typeToExclude: ProtectionType): Position[] {
     const availablePositions: Position[] = [];
     space.forEach((column, x) => {
-      column.forEach((_, y) => {
-        const block: GameBlockData = this.getBlock(space, { x, y });
+      column.forEach((block, y) => {
         if (block.type !== GameBlockType.free || block.isProtected[typeToExclude]) return;
         availablePositions.push({ x, y });
       });

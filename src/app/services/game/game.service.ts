@@ -164,8 +164,14 @@ export class GameService {
   private processEnemyInteraction(game: Game, level: Level, snake: Snake,  position: Position): void {
     const enemyType: EnemyType | null = this.spaceService.enemyTypeAhead(game.space, position);
     if (enemyType === null) return;
-    this.gameEntity.processEnemyInteraction(game, level, position, enemyType, snake.body.length);
-    this.gameSnake.reduceSnake(game, level, snake, ENEMY_DATA[enemyType].damage);
+    const snakeHealth: number = snake.body.length + game.delayedGrowth;
+    const damage: number = ENEMY_DATA[enemyType].damage;
+    if (damage >= snake.body.length) {
+      const overkill: number = damage - snake.body.length + 1;
+      game.delayedGrowth = Math.max(0, game.delayedGrowth - overkill);
+    }
+    this.gameEntity.processEnemyInteraction(game, level, position, enemyType, snakeHealth);
+    this.gameSnake.reduceSnake(game, level, snake, damage);
   }
 
   //===========================================================================
