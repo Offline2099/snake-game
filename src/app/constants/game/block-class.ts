@@ -1,4 +1,4 @@
-import { Direction } from '../general/direction.enum';
+import { Direction } from '../general/direction/direction.enum';
 import { GameBlockType } from './game-block-type.enum';
 import { ObstacleType } from '../obstacles/obstacle-type.enum';
 import { PortalType } from '../portals/portal-type.enum';

@@ -1,4 +1,4 @@
-import { Direction } from '../../../constants/general/direction.enum';
+import { Direction } from '../../../constants/general/direction/direction.enum';
 import { ObstacleType } from '../../../constants/obstacles/obstacle-type.enum';
 import { PortalType } from '../../../constants/portals/portal-type.enum';
 import { EnemyType } from '../../../constants/enemies/enemy-type.enum';

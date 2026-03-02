@@ -29,5 +29,5 @@ export const DEFAULT_LEVEL_DATA: LevelData = {
     [EnemyType.shit]: { ...DEFAULT_ENTITY_PARAMETERS },
     [EnemyType.fire]: { ...DEFAULT_ENTITY_PARAMETERS }
   },
-  entities: []
+  map: {}
 }

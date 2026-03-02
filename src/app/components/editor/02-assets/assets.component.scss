@@ -2,10 +2,10 @@
 
 :host {
   @include tab;
+  gap: 10px;
 }
 
 section {
-  margin: 10px 0;
   gap: 6px;
   padding: 0 5px;
 }
@@ -17,6 +17,7 @@ section {
   padding: 3px;
   background-color: $bg-base;
   border: 1px solid $border-normal;
+  border-radius: 4px;
   transition: .2s;
   cursor: pointer;
   &.selected {

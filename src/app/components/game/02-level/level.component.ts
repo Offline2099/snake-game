@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef, HostListener, input, output } from '@angu
 import { Subscription, interval } from 'rxjs';
 // Constants & Enums
 import { GameState } from '../../../constants/game/game-state.enum';
+import { DIRECTION_BY_KEY } from '../../../constants/general/direction/direction-by-key';
 // Interfaces & Types
 import { Game } from '../../../types/game/game.interface';
 import { Level } from '../../../types/level/level.interface';
@@ -34,14 +35,6 @@ export class LevelComponent {
   @HostListener('window:keydown', ['$event']) onKeyboardEvent(event: KeyboardEvent): void {
     event.preventDefault();
     this.handleKeyboardEvent(event.key);
-  }
-
-  handleKeyboardEvent(key: string): void {
-    if (key === ' ' && this.game.state === GameState.ready) {
-      this.startTimer();
-      return;
-    }
-    if (this.timer) this.gameService.changeSnakeDirection(this.game, this.snake, key);
   }
 
   level = input.required<Level>();
@@ -98,6 +91,26 @@ export class LevelComponent {
 
   showMenu(): void {
     this.toMenu.emit();
+  }
+
+  handleKeyboardEvent(key: string): void {
+    if (key === 'Escape') this.showMenu();
+    switch (this.game.state) {
+      case GameState.ready:
+        if (key === ' ') this.startTimer();
+        break;
+      case GameState.running:
+        if (DIRECTION_BY_KEY[key] !== undefined) 
+          this.gameService.changeSnakeDirection(this.game, this.snake, key)
+        break;
+      case GameState.defeat:
+        if (key === ' ' || key === 'Enter') this.resetGame();
+        break;
+      case GameState.victory:
+        if (key === 'Enter') this.showMenu();
+        if (key === ' ') this.resetGame();
+        break;
+    }
   }
 
   ngOnDestroy(): void {

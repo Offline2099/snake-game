@@ -1,4 +1,4 @@
-import { Direction } from '../general/direction.enum';
+import { Direction } from '../general/direction/direction.enum';
 import { SnakeOptions } from '../../types/snake/snake-options.interface';
 
 export const DEFAULT_SNAKE: SnakeOptions = {

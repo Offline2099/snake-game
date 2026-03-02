@@ -1,11 +1,14 @@
 <!-- Mode Selection -->
 <section>
   <label>Mode:</label>
-  @for (mode of ASSET_PLACING_MODES; track mode.id) {
+  @for (mode of MODE_LIST; track mode.id) {
     <button
       type="button"
       class="editor-button" 
-      [ngClass]="{ 'selected': selectedModeId() === mode.id }"
+      [ngClass]="{ 
+        'selected': selectedMode() === mode.id,
+        'disabled': isButtonActive()
+      }"
       (click)="selectMode(mode.id)">
       {{ mode.name }}
     </button>
@@ -13,47 +16,74 @@
 </section>
 
 <!-- Obstacles -->
+<h3>Obstacles</h3>
 <ng-template
   [ngTemplateOutlet]="assetGroup"
-  [ngTemplateOutletContext]="{
-    name: 'Obstacles',
-    assets: obstacles
-  }"
+  [ngTemplateOutletContext]="{ assets: obstacles }"
 />
+<section>
+  <button
+    type="button"
+    class="editor-button"
+    [ngClass]="{ 
+      'selected': selectedAsset().type === AssetType.obstacle 
+        && selectedAsset().subType === ObstacleType.wallHorizontal
+        && isButtonActive()
+    }"
+    (click)="addWall(Orientation.horizontal)">
+    Horizontal Wall
+  </button>
+  <button
+    type="button"
+    class="editor-button"
+    [ngClass]="{ 
+      'selected': selectedAsset().type === AssetType.obstacle 
+        && selectedAsset().subType === ObstacleType.wallVertical
+        && isButtonActive()
+    }"
+    (click)="addWall(Orientation.vertical)">
+    Veritcal Wall
+  </button>
+</section>
 
 <!-- Portals -->
 <h3>Portals</h3>
 <section>
-  <button type="button" class="editor-button" (click)="addPortal()">Add Portal</button>
+  <button
+    type="button"
+    class="editor-button"
+    [ngClass]="{ 'selected': selectedAsset().type === AssetType.portal }"
+    (click)="addPortal()">
+    Add Portal
+  </button>
 </section>
 
 <!-- Enemies -->
+<h3>Enemies</h3>
 <ng-template
   [ngTemplateOutlet]="assetGroup"
-  [ngTemplateOutletContext]="{
-    name: 'Enemies',
-    assets: enemies
-  }"
+  [ngTemplateOutletContext]="{ assets: enemies }"
 />
 
 <!-- Food -->
+<h3>Food</h3>
 <ng-template
   [ngTemplateOutlet]="assetGroup"
-  [ngTemplateOutletContext]="{
-    name: 'Food',
-    assets: food
-  }"
+  [ngTemplateOutletContext]="{ assets: food }"
 />
 
 <!-- Template: Asset Group -->
-<ng-template #assetGroup let-name="name" let-assets="assets">
-  <h3>{{ name }}</h3>
+<ng-template #assetGroup let-assets="assets">
   <section>
-    @for (asset of assets; track $index) {
+    @for (asset of assets; track asset.subType) {
       <div
         class="asset-wrapper"
-        [ngClass]="{ 'selected': asset === selectedAsset() }"
-        (click)="selectAsset(asset)">
+        [ngClass]="{ 
+          'selected': asset.type === selectedAsset().type 
+            && asset.subType === selectedAsset().subType
+            && !isButtonActive()
+        }"
+        (click)="pickAsset(asset)">
         <app-asset-block [type]="asset.type" [subType]="asset.subType" />
       </div>
     }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Direction } from '../constants/general/direction.enum';
+import { Direction } from '../constants/general/direction/direction.enum';
 import { DEFAULT_SNAKE } from '../constants/snake/default-snake';
 import { BodyBlockType } from '../constants/snake/body-block-type.enum';
 // Interfaces & Types
@@ -169,7 +169,7 @@ export class SnakeService {
     snake.body.push(this.createBodyBlock(
       snake.tail.currentPosition,
       snake.tail.currentDirection,
-      this.geometry.getDirection(snake.tail.currentPosition, snake.tail.previousPosition)
+      this.geometry.oppositeDirection(snake.tail.previousDirection)
     ));
     snake.tail = this.createTailBlock(snake.tail.previousPosition, snake.tail.previousDirection);
   }

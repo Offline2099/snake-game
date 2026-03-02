@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { DEFAULT_GAME_BLOCK } from '../constants/game/delault-game-block';
 import { GameBlockType } from '../constants/game/game-block-type.enum';
 import { ProtectionType } from '../constants/game/protection-type.enum';
-import { PortalType } from '../constants/portals/portal-type.enum';
 import { FoodType } from '../constants/food/food-type.enum';
 import { EnemyType } from '../constants/enemies/enemy-type.enum';
 // Interfaces & Types
@@ -11,17 +9,24 @@ import { Position } from '../types/general/position.interface';
 import { Rectangle } from '../types/general/rectangle.interface';
 import { GameBlockData } from '../types/game/space/game-block-data.interface';
 import { Space } from '../types/game/space/space.type';
-import { Protection } from '../types/game/space/protection.type';
 import { GameBlockSubType } from '../types/game/space/game-block-subtype.type';
 // Services
+import { UtilityService } from './general/utility.service';
 import { GeometryService } from './general/geometry.service';
+import { GameBlockService } from './game/game-block.service';
+
+const RANDOM_GUESS_ATTEMPTS: number = 10;
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpaceService {
 
-  constructor(private geometry: GeometryService) {}
+  constructor(
+    private utility: UtilityService,
+    private geometry: GeometryService,
+    private gameBlock: GameBlockService
+  ) { }
 
   //===========================================================================
   //  Space Construction
@@ -30,34 +35,8 @@ export class SpaceService {
   createSpace(sizeX: number, sizeY: number): Space {
     return Array.from(
       { length: sizeX },
-      () => Array.from({ length: sizeY }, () => this.defaultBlock())
+      () => Array.from({ length: sizeY }, () => this.gameBlock.defaultBlock())
     );
-  }
-
-  defaultBlock(): GameBlockData {
-    return {
-      ...DEFAULT_GAME_BLOCK,
-      isProtected: { ...DEFAULT_GAME_BLOCK.isProtected }
-    }
-  }
-
-  createBlock(type: GameBlockType, subType?: GameBlockSubType, protection?: Protection): GameBlockData {
-    return {
-      type,
-      subType,
-      isProtected: protection ? { ...protection } : { ...DEFAULT_GAME_BLOCK.isProtected }
-    }
-  }
-
-  createPortalBlock(portalType: PortalType): GameBlockData {
-    return {
-      type: GameBlockType.portal,
-      subType: portalType,
-      isProtected: {
-        [ProtectionType.noEnemySpawn]: true,
-        [ProtectionType.noFoodSpawn]: true
-      }
-    }
   }
 
   //===========================================================================
@@ -93,13 +72,29 @@ export class SpaceService {
     return subType 
       ? block.type === type && block.subType === subType
       : block.type === type;
-  } 
+  }
 
-  availableSpace(space: Space, typeToExclude: ProtectionType): Position[] {
+  randomFreePosition(space: Space, typeToExclude: ProtectionType): Position | null {
+    let position: Position | null = null;
+    for (let attempt = 0; attempt < RANDOM_GUESS_ATTEMPTS; attempt++) {
+      position = {
+        x: this.utility.randomInteger(0, space.length - 1),
+        y: this.utility.randomInteger(0, space[0].length - 1)
+      };
+      const block: GameBlockData = this.getBlock(space, position);
+      if (block.type === GameBlockType.free && !block.isProtected[typeToExclude]) break;
+      else position = null;
+    }
+    if (position) return position;
+    const availablePositions: Position[] = this.availableSpace(space, typeToExclude);
+    if (!availablePositions.length) return null;
+    return this.utility.randomFromArray(availablePositions);
+  }
+
+  private availableSpace(space: Space, typeToExclude: ProtectionType): Position[] {
     const availablePositions: Position[] = [];
     space.forEach((column, x) => {
-      column.forEach((_, y) => {
-        const block: GameBlockData = this.getBlock(space, { x, y });
+      column.forEach((block, y) => {
         if (block.type !== GameBlockType.free || block.isProtected[typeToExclude]) return;
         availablePositions.push({ x, y });
       });
@@ -143,16 +138,9 @@ export class SpaceService {
   //===========================================================================
 
   protectPerimeter(space: Space, margin: number, protectionType: ProtectionType): void {
-    space.forEach((column, x) => {
-      column.forEach((_, y) => {
-        if (
-          x < margin
-          || x > space.length - margin - 1
-          || y < margin
-          || y > space[x].length - margin - 1
-        ) this.setBlockProtectionState(space, { x, y }, protectionType, true);
-      });
-    });
+    this.geometry.positionsNearPerimeter(this.toRectangle(space), margin).forEach(position => 
+      this.setBlockProtectionState(space, position, protectionType, true)
+    );
   }
 
   setAreaProtectionState(
@@ -161,7 +149,7 @@ export class SpaceService {
     protectionType: ProtectionType,
     protectionState: boolean
   ): void {
-    this.geometry.positionsWithinArea(area).forEach(position => 
+    this.geometry.positionsWithinRectangle(area).forEach(position => 
       this.setBlockProtectionState(space, position, protectionType, protectionState)
     );
   }

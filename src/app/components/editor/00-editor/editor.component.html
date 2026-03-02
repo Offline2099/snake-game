@@ -12,7 +12,8 @@
   <app-area
     [(level)]="level"
     [(selectedAsset)]="selectedAsset"
-    [(selectedModeId)]="selectedModeId"
+    [(selectedMode)]="selectedMode"
+    [(previousMode)]="previousMode"
   />
 
   <!-- Tab Container -->
@@ -34,7 +35,11 @@
     <!-- Tabs -->
     @switch (selectedTabId) {
       @case (EditorTabId.assets) {
-        <app-assets [(selectedAsset)]="selectedAsset" [(selectedModeId)]="selectedModeId" />
+        <app-assets
+          [(selectedAsset)]="selectedAsset"
+          [(selectedMode)]="selectedMode"
+          [(previousMode)]="previousMode"
+        />
       }
       @case (EditorTabId.properties) {
         <app-properties [(level)]="level" />

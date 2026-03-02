@@ -1,7 +1,7 @@
 <!-- Horizontal Ruler (Top) -->
 <ng-template
   [ngTemplateOutlet]="ruler"
-  [ngTemplateOutletContext]="{ orientation: RulerOrientation.horizontal }"
+  [ngTemplateOutletContext]="{ orientation: Orientation.horizontal }"
 />
 
 <div class="middle-wrapper">
@@ -9,60 +9,57 @@
   <!-- Vertical Ruler (Left) -->
   <ng-template
     [ngTemplateOutlet]="ruler"
-    [ngTemplateOutletContext]="{ orientation: RulerOrientation.vertical }"
+    [ngTemplateOutletContext]="{ orientation: Orientation.vertical }"
   />
 
   <!-- Game Space Area -->
   <div
     class="game-space"
-    (mousemove)="onMousePositionChange($event)"
-    (mouseleave)="setDefaultMousePosition()"
+    (mousemove)="onMouseMove($event)"
+    (mouseleave)="onMouseLeave()"
     (click)="onMapLeftClick()"
     (contextmenu)="onMapRightClick($event)">
 
     <!-- Entities -->
-    @for (entity of level().entities; track $index) {
-      <app-asset-block
-        class="game-block"
-        [type]="entity.block.type"
-        [subType]="entity.block.subType"
-        [ngStyle]="{
-          'left.px': BLOCK_SIZE * entity.position.x,
-          'bottom.px': BLOCK_SIZE * entity.position.y
-        }"
+    @for (entity of levelMapEntities; track entity.position) {
+      <ng-template 
+        [ngTemplateOutlet]="asset"
+        [ngTemplateOutletContext]="{ entity }"
       />
     }
 
     <!-- Temporary Entities -->
-    @for (entity of temporaryArray; track $index) {
-      <app-asset-block
-        class="game-block temporary"
-        [type]="entity.block.type"
-        [subType]="entity.block.subType"
-        [ngStyle]="{
-          'left.px': BLOCK_SIZE * entity.position.x,
-          'bottom.px': BLOCK_SIZE * entity.position.y
-        }"
+    @for (entity of actionEntities; track entity.position) {
+      <ng-template 
+        [ngTemplateOutlet]="asset"
+        [ngTemplateOutletContext]="{ entity, isTemporary: true }"
       />
     }
 
-    <!-- Position Tracker -->
-    <div
-      class="position-tracker"
-      [ngClass]="{ 'invisible': mousePx.x < 0 || mousePx.y < 0 }"
-      [ngStyle]="{
-        'left.px': mousePx.x + TRACKER_SHIFT,
-        'top.px': mousePx.y + TRACKER_SHIFT
-      }">
-      <ng-container>x: {{mousePosition.x}}, y: {{mousePosition.y}}</ng-container>
-    </div>
+    <!-- Tooltip -->
+    @if (mousePixelPosition) {
+      <app-tooltip 
+        [cursor]="mousePosition()!"
+        [blocks]="levelMapEntities"
+        [areas]="level().map?.areas || []"
+        [walls]="level().map?.walls || []"
+        [portals]="level().map?.portals || []"
+        [asset]="selectedAsset()"
+        [mode]="selectedMode()"
+        [isActionInProgress]="isActionInProgress"
+        [ngStyle]="{
+          'left.px': mousePixelPosition.x + TOOLTIP_SHIFT_PX,
+          'top.px': mousePixelPosition.y + TOOLTIP_SHIFT_PX
+        }"
+      />
+    }
 
   </div>
 
   <!-- Vertical Ruler (Right) -->
   <ng-template
     [ngTemplateOutlet]="ruler"
-    [ngTemplateOutletContext]="{ orientation: RulerOrientation.vertical }"
+    [ngTemplateOutletContext]="{ orientation: Orientation.vertical }"
   />
   
 </div>
@@ -70,7 +67,7 @@
 <!-- Horizontal Ruler (Bottom) -->
 <ng-template
   [ngTemplateOutlet]="ruler"
-  [ngTemplateOutletContext]="{ orientation: RulerOrientation.horizontal }"
+  [ngTemplateOutletContext]="{ orientation: Orientation.horizontal }"
 />
 
 <!-- Template: Ruler -->
@@ -78,11 +75,32 @@
   <div
     class="ruler"
     [ngClass]="{
-      'horizontal': orientation === RulerOrientation.horizontal,
-      'vertical': orientation === RulerOrientation.vertical
+      'horizontal': orientation === Orientation.horizontal,
+      'vertical': orientation === Orientation.vertical
     }">
     @for (block of [].constructor(AREA_SIZE); track $index) {
-      <span>{{ $index }}</span>
+      <span
+        [ngClass]="{ 
+          'match': mousePosition() !== null &&
+            (orientation === Orientation.horizontal && mousePosition()!.x === $index
+            || orientation === Orientation.vertical && mousePosition()!.y === $index)
+        }">
+        {{ $index }}
+      </span>
     }
   </div>  
+</ng-template>
+
+<!-- Template: Asset -->
+<ng-template #asset let-entity="entity" let-isTemporary="isTemporary">
+  <app-asset-block
+    class="game-block temporary"
+    [ngClass]="{ 'temporary': isTemporary }"
+    [type]="entity.block.type"
+    [subType]="entity.block.subType"
+    [ngStyle]="{
+      'left.px': BLOCK_SIZE * entity.position.x,
+      'bottom.px': BLOCK_SIZE * entity.position.y
+    }"
+  />
 </ng-template>

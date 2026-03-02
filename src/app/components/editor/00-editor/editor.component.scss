@@ -1,10 +1,16 @@
 @use '../../../../scss' as *;
 
 :host {
+  position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   padding: 15px;
   gap: 15px;
+}
+
+app-area {
+  z-index: 2;
 }
 
 .wrapper {

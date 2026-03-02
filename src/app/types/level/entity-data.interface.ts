@@ -1,7 +1,7 @@
 import { Position } from '../general/position.interface';
-import { GameBlockData } from '../game/space/game-block-data.interface';
+import { GameBlockBase } from '../game/space/game-block-base.interface';
 
 export interface EntityData {
   position: Position;
-  block: GameBlockData;
+  block: GameBlockBase;
 }

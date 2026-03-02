@@ -1,11 +1,6 @@
-import { Position } from '../../general/position.interface';
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { GameBlockSubType } from './game-block-subtype.type';
+import { GameBlockBase } from './game-block-base.interface';
 import { Protection } from './protection.type';
 
-export interface GameBlockData {
-  type: GameBlockType;
-  subType?: GameBlockSubType;
+export interface GameBlockData extends GameBlockBase {
   isProtected: Protection;
-  portalTo?: Position;
 }
