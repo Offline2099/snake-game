@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
-import { Orientation } from '../../../constants/general/orientation.enum';
+import { ORIENTATION } from '../../../constants/general/orientation/orientation';
 import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode-id.enum';
 import { GameBlockType } from '../../../constants/game/game-block-type.enum';
 import { PortalType } from '../../../constants/portals/portal-type.enum';
@@ -27,11 +27,6 @@ interface GameBlock extends GameBlockBase {
 interface WallData extends Wall {
   orientaion: string;
   length: number;
-}
-
-const ORIENTATION: Record<Orientation, string> = {
-  [Orientation.horizontal]: 'Horizontal',
-  [Orientation.vertical]: 'Vertical'
 }
 
 @Component({

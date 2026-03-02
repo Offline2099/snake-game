@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Direction } from '../../constants/general/direction.enum';
+import { Direction } from '../../constants/general/direction/direction.enum';
+import { DIRECTION_BY_KEY } from '../../constants/general/direction/direction-by-key';
 import { AREA_SIZE } from '../../constants/game/game-area';
 import { DEFAULT_STEP_TIME } from '../../constants/game/default-step-time';
 import { GameState } from '../../constants/game/game-state.enum';
-import { GameBlockType } from '../../constants/game/game-block-type.enum';
 import { FoodType } from '../../constants/food/food-type.enum';
 import { EnemyType } from '../../constants/enemies/enemy-type.enum';
 import { ENEMY_DATA } from '../../constants/enemies/enemy-data';
 // Interfaces & Types
 import { Position } from '../../types/general/position.interface';
 import { Game } from '../../types/game/game.interface';
+import { GameStats } from '../../types/game/stats/game-stats.interface';
 import { Level } from '../../types/level/level.interface';
 import { Snake } from '../../types/snake/snake.interface.ts';
 import { GameBlockBase } from '../../types/game/space/game-block-base.interface';
@@ -53,16 +54,7 @@ export class GameService {
       state: GameState.ready,
       progress: 0,
       stepTime: DEFAULT_STEP_TIME,
-      stats: {
-        stepsDone: 0,
-        elapsedTime: 0,
-        food: this.gameEntity.initialFoodStats(level),
-        enemies: this.gameEntity.initialEnemyStats(level),
-        totalFoodEaten: 0,
-        totalFoodValue: 0,
-        totalEnemiesHit: 0,
-        totalDamageTaken: 0
-      },
+      stats: this.initialGameStats(level),
       portals: [],
       delayedGrowth: 0
     }
@@ -72,6 +64,19 @@ export class GameService {
     this.gameEntity.spawnInitialEnemies(game, level);
     this.gameEntity.spawnInitialFood(game, level);
     return game;
+  }
+
+  private initialGameStats(level: Level): GameStats {
+    return {
+      stepsDone: 0,
+      elapsedTime: 0,
+      food: this.gameEntity.initialFoodStats(level),
+      enemies: this.gameEntity.initialEnemyStats(level),
+      totalFoodEaten: 0,
+      totalFoodValue: 0,
+      totalEnemiesHit: 0,
+      totalDamageTaken: 0
+    }
   }
 
   private setMap(game: Game, level: Level): void {
@@ -113,6 +118,7 @@ export class GameService {
   private setPortals(game: Game, level: Level): void {
     if (!level.settings.map?.portals) return;
     level.settings.map.portals.forEach(portal => {
+      game.portals.push(portal);
       this.setMapBlock(game, level, portal.entrance, this.gameBlock.portalEntrance(portal.exit));
       this.setMapBlock(game, level, portal.exit, this.gameBlock.portalExit());
     });
@@ -121,8 +127,6 @@ export class GameService {
   private setMapBlock(game: Game, level: Level, position: Position, block: GameBlockBase): void {
     this.spaceService.setBlock(game.space, position, block as GameBlockData);
     this.gameSpace.protectEntity(game, level, position, block.type);
-    if (block.type === GameBlockType.portal && block.portalTo)
-      game.portals.push({ entrance: position, exit: block.portalTo });
   }
 
   //===========================================================================
@@ -179,13 +183,8 @@ export class GameService {
   //===========================================================================
 
   changeSnakeDirection(game: Game, snake: Snake, key: string): void {
-    const directions: Record<string, Direction> = {
-      ['ArrowUp']: Direction.up,
-      ['ArrowDown']: Direction.down,
-      ['ArrowLeft']: Direction.left,
-      ['ArrowRight']: Direction.right
-    }
-    this.gameSnake.turnSnake(game, snake, directions[key]);
+    const direction: Direction | undefined = DIRECTION_BY_KEY[key];
+    if (direction) this.gameSnake.turnSnake(game, snake, direction);
   }
 
 }

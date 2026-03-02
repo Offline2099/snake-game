@@ -1,7 +1,7 @@
 import { Component, signal, effect, model } from '@angular/core';
 import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
-import { Orientation } from '../../../constants/general/orientation.enum';
+import { Orientation } from '../../../constants/general/orientation/orientation.enum';
 import { AREA_SIZE, BLOCK_SIZE } from '../../../constants/game/game-area';
 import { AssetPlacingModeId as Mode } from '../../../constants/editor/asset-placing-mode-id.enum';
 import { GameBlockType } from '../../../constants/game/game-block-type.enum';
@@ -234,7 +234,7 @@ export class AreaComponent {
 
   updateAreaActionEntities(anchor: Position, mouse: Position, block: GameBlockBase): void {
     const area: Rectangle = this.geometry.rectangleFromTwoPoints(anchor, mouse);
-    this.actionEntities = this.geometry.positionsWithinArea(area)
+    this.actionEntities = this.geometry.positionsWithinRectangle(area)
       .map(position => ({ position, block }));
   }
 

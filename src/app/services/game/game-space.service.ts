@@ -65,7 +65,7 @@ export class GameSpaceService {
   //===========================================================================
 
   unprotectArea(game: Game, level: Level, area: Rectangle): void {
-    this.unprotectPositions(game, level, this.geometry.positionsWithinArea(area));
+    this.unprotectPositions(game, level, this.geometry.positionsWithinRectangle(area));
   }
   
   unprotectMargin(game: Game, level: Level, center: Position, margin: number): void {

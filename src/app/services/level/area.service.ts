@@ -23,7 +23,7 @@ export class AreaService {
   }
 
   includedPositions(area: Area): Position[] {
-    return this.geometry.positionsWithinArea(area.rectangle)
+    return this.geometry.positionsWithinRectangle(area.rectangle)
       .filter(position => !this.isPositionExcluded(area, position));
   } 
 
@@ -53,7 +53,7 @@ export class AreaService {
 
   private isRectangleContainedInExcludedPositions(area: Area, rectangle: Rectangle): boolean {
     if (!area.excludePositions) return false;
-    return !this.geometry.positionsWithinArea(rectangle).some(position => 
+    return !this.geometry.positionsWithinRectangle(rectangle).some(position => 
       !this.isPositionContainedInExcludedPositions(area, position)
     );
   }
@@ -94,7 +94,7 @@ export class AreaService {
 
   includeRectangle(area: Area, rectangle: Rectangle): void {
     if (area.excludePositions) 
-      this.geometry.positionsWithinArea(rectangle).forEach(position => 
+      this.geometry.positionsWithinRectangle(rectangle).forEach(position => 
         this.includePosition(area, position)
       );
     if (!area.excludeRectangles) return;

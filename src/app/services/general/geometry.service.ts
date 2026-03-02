@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Direction } from '../../constants/general/direction.enum';
+import { Direction } from '../../constants/general/direction/direction.enum';
+import { OPPOSITE_DIRECTION } from '../../constants/general/direction/opposite-direction';
 import { Position } from '../../types/general/position.interface';
 import { Rectangle } from '../../types/general/rectangle.interface';
-import { Portal } from '../../types/general/portal.interface';
 
-const OPPOSITE_DIRECTION_MAP: Record<Direction, Direction> = {
-  [Direction.up]: Direction.down,
-  [Direction.down]: Direction.up,
-  [Direction.left]: Direction.right,
-  [Direction.right]: Direction.left
-};
+type Shift = -1 | 0 | 1;
+interface Vector { x: number, y: number };
+interface ShiftVector { x: Shift, y: Shift };
 
-const SHIFT_MAP: Record<Direction, { x: -1 | 0 | 1, y: -1 | 0 | 1 }> = {
+const SHIFT_MAP: Record<Direction, ShiftVector> = {
   [Direction.up]: { x: 0, y: 1 },
   [Direction.down]: { x: 0, y: -1 },
   [Direction.left]: { x: -1, y: 0 },
@@ -29,25 +26,29 @@ export class GeometryService {
   }
 
   /**
-   * Returns the direction of movement for given start and end positions, 
+   * Returns the direction of movement between two given positions, 
    * assuming that only horizontal or vertical movement is possible, and 
    * that the start and end positions can only be adjacent to each other.
    */
-  getDirection(start: Position, end: Position): Direction {
-    if (start.y < end.y) return Direction.up;
-    if (start.y > end.y) return Direction.down;
-    if (start.x > end.x) return Direction.left;
-    return Direction.right;
+  getDirection(from: Position, to: Position): Direction {
+    const shift: Vector = { x: to.x - from.x, y: to.y - from.y };
+    if (!shift.x) {
+      if (shift.y === 1) return Direction.up;
+      if (shift.y === -1) return Direction.down;
+    }
+    if (shift.x === 1) return Direction.right;
+    if (shift.x === -1) return Direction.left;
+    throw new Error('Invalid positions');
   }
 
   /** Returns the direction opposite to the specified one. */
   oppositeDirection(direction: Direction): Direction {
-    return OPPOSITE_DIRECTION_MAP[direction];
+    return OPPOSITE_DIRECTION[direction];
   }
 
   /**
-   * Returns the position, shifted by a given amount of blocks, in the specified 
-   * direction, relative to the initial position. The default amount is 1.
+   * Returns the position shifted by a given amount of blocks in the specified 
+   * direction relative to the initial position. The default amount is 1.
    */
   shiftPosition(initial: Position, direction: Direction, amount: number = 1): Position {
     return {
@@ -73,68 +74,10 @@ export class GeometryService {
     }
   }
 
-  /** Checks if a given position is outside the specified rectangle. */
-  isOutsideRectangle(rectangle: Rectangle, position: Position): boolean {
-    return position.x < rectangle.topLeft.x
-      || position.x > rectangle.bottomRight.x
-      || position.y < rectangle.bottomRight.y
-      || position.y > rectangle.topLeft.y;
-  }
-
-  /** Checks if a given position is within the specified rectangle. */
-  isWithinRectangle(rectangle: Rectangle, position: Position): boolean {
-    return !this.isOutsideRectangle(rectangle, position);
-  }
-
   /** 
-   * Checks if a given position is near the perimeter of a specified rectangle
-   * within a given margin.
+   * Creates a rectangle that represents the intersection between two given
+   * rectangles. Returns null if there is no intersection.
    */
-  isNearPerimeter(rectangle: Rectangle, position: Position, margin: number): boolean {
-    const innerRectangle: Rectangle = this.rectangleFromTwoPoints(
-      { x: rectangle.topLeft.x + margin, y: rectangle.topLeft.y - margin },
-      { x: rectangle.bottomRight.x - margin, y: rectangle.bottomRight.y + margin }
-    );
-    return this.isOutsideRectangle(innerRectangle, position)
-      && !this.isOutsideRectangle(rectangle, position);
-  }
-
-  /** Generates an array of positions within a specified margin from a center position. */
-  positionsWithinMargin(center: Position, margin: number): Position[] {
-    const positions: Position[] = [];
-    for(let x = center.x - margin; x <= center.x + margin; x++) {
-      for(let y = center.y + margin; y >= center.y - margin; y--) {
-        positions.push({ x, y });
-      }
-    }
-    return positions;
-  }
-
-  /** Generates an array of positions within a specified rectangle area. */
-  positionsWithinArea(rectangle: Rectangle): Position[] {
-    const positions: Position[] = [];
-    for(let x = rectangle.topLeft.x; x <= rectangle.bottomRight.x; x++) {
-      for(let y = rectangle.topLeft.y; y >= rectangle.bottomRight.y; y--) {
-        positions.push({ x, y });
-      }
-    }
-    return positions;
-  }
-
-  isSingleBlock(rectangle: Rectangle): boolean {
-    return this.isSamePosition(rectangle.topLeft, rectangle.bottomRight);
-  }
-
-  isSameRectangle(a: Rectangle, b: Rectangle): boolean {
-    return this.isSamePosition(a.topLeft, b.topLeft)
-      && this.isSamePosition(a.bottomRight, b.bottomRight);
-  }
-
-  isRectangleWithinAnother(outer: Rectangle, inner: Rectangle): boolean {
-    return !this.isOutsideRectangle(outer, inner.topLeft)
-      && !this.isOutsideRectangle(outer, inner.bottomRight);
-  }
-
   rectangleFromIntersection(a: Rectangle, b: Rectangle): Rectangle | null {
     const left = Math.max(a.topLeft.x, b.topLeft.x);
     const right = Math.min(a.bottomRight.x, b.bottomRight.x);
@@ -148,6 +91,10 @@ export class GeometryService {
       : null;
   }
 
+  /**
+   * Creates a rectangle from a given array of positions. Returns null 
+   * if positions in the array do not form a rectangle.
+   */
   rectangleFromPositions(positions: Position[]): Rectangle | null {
     if (positions.length === 0) return null;
     let left: number = Number.MAX_SAFE_INTEGER;
@@ -168,9 +115,85 @@ export class GeometryService {
       : null;
   }
 
-  isSamePortal(a: Portal, b: Portal): boolean {
-    return this.isSamePosition(a.entrance, b.entrance)
-      && this.isSamePosition(a.exit, b.exit);
+  /** Checks whether the given rectangle includes only one position. */
+  isSingleBlock(rectangle: Rectangle): boolean {
+    return this.isSamePosition(rectangle.topLeft, rectangle.bottomRight);
+  }
+
+  /** Returns true if the two given rectangles are the same, false otherwise. */
+  isSameRectangle(a: Rectangle, b: Rectangle): boolean {
+    return this.isSamePosition(a.topLeft, b.topLeft)
+      && this.isSamePosition(a.bottomRight, b.bottomRight);
+  }
+
+  /** Checks if a given position is outside the specified rectangle. */
+  isOutsideRectangle(rectangle: Rectangle, position: Position): boolean {
+    return position.x < rectangle.topLeft.x
+      || position.x > rectangle.bottomRight.x
+      || position.y < rectangle.bottomRight.y
+      || position.y > rectangle.topLeft.y;
+  }
+
+  /** Checks if a given position is within the specified rectangle. */
+  isWithinRectangle(rectangle: Rectangle, position: Position): boolean {
+    return !this.isOutsideRectangle(rectangle, position);
+  }
+
+  /** Checks whether the inner rectangle is entirely within the outer one. */
+  isRectangleWithinAnother(outer: Rectangle, inner: Rectangle): boolean {
+    return this.isWithinRectangle(outer, inner.topLeft)
+      && this.isWithinRectangle(outer, inner.bottomRight);
+  }
+
+  /** 
+   * Checks if a given position is near the perimeter of a specified rectangle
+   * within a given margin.
+   */
+  isNearPerimeter(rectangle: Rectangle, position: Position, margin: number): boolean {
+    const innerRectangle: Rectangle = {
+      topLeft: { x: rectangle.topLeft.x + margin, y: rectangle.topLeft.y - margin },
+      bottomRight: { x: rectangle.bottomRight.x - margin, y: rectangle.bottomRight.y + margin }
+    };
+    return this.isWithinRectangle(rectangle, position) 
+      && this.isOutsideRectangle(innerRectangle, position);
+  }
+
+  /** Returns an array of all positions within a specified margin from a center position. */
+  positionsWithinMargin(center: Position, margin: number): Position[] {
+    const positions: Position[] = [];
+    for (let x = center.x - margin; x <= center.x + margin; x++) {
+      for (let y = center.y + margin; y >= center.y - margin; y--) {
+        positions.push({ x, y });
+      }
+    }
+    return positions;
+  }
+
+  /** Returns an array of all positions within a specified rectangle. */
+  positionsWithinRectangle(rectangle: Rectangle): Position[] {
+    const positions: Position[] = [];
+    for (let x = rectangle.topLeft.x; x <= rectangle.bottomRight.x; x++) {
+      for (let y = rectangle.topLeft.y; y >= rectangle.bottomRight.y; y--) {
+        positions.push({ x, y });
+      }
+    }
+    return positions;
+  }
+
+  /** 
+   * Returns an array of all positions near the specified rectangle's perimeter
+   * within the given margin.
+   */
+  positionsNearPerimeter(rectangle: Rectangle, margin: number): Position[] {
+    const positions: Position[] = [];
+    for (let x = rectangle.topLeft.x; x <= rectangle.bottomRight.x; x++) {
+      for (let y = rectangle.topLeft.y; y >= rectangle.bottomRight.y; y--) {
+        const position: Position = { x, y };
+        if (this.isNearPerimeter(rectangle, position, margin)) positions.push({ x, y });
+        else y = rectangle.bottomRight.y + margin;
+      }
+    }
+    return positions;
   }
 
 }

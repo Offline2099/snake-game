@@ -138,16 +138,9 @@ export class SpaceService {
   //===========================================================================
 
   protectPerimeter(space: Space, margin: number, protectionType: ProtectionType): void {
-    space.forEach((column, x) => {
-      column.forEach((_, y) => {
-        if (
-          x < margin
-          || x > space.length - margin - 1
-          || y < margin
-          || y > space[x].length - margin - 1
-        ) this.setBlockProtectionState(space, { x, y }, protectionType, true);
-      });
-    });
+    this.geometry.positionsNearPerimeter(this.toRectangle(space), margin).forEach(position => 
+      this.setBlockProtectionState(space, position, protectionType, true)
+    );
   }
 
   setAreaProtectionState(
@@ -156,7 +149,7 @@ export class SpaceService {
     protectionType: ProtectionType,
     protectionState: boolean
   ): void {
-    this.geometry.positionsWithinArea(area).forEach(position => 
+    this.geometry.positionsWithinRectangle(area).forEach(position => 
       this.setBlockProtectionState(space, position, protectionType, protectionState)
     );
   }

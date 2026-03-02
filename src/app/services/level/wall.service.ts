@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Orientation } from '../../constants/general/orientation.enum';
+import { Orientation } from '../../constants/general/orientation/orientation.enum';
 import { ObstacleType } from '../../constants/obstacles/obstacle-type.enum';
 // Interfaces & types
 import { Position } from '../../types/general/position.interface';

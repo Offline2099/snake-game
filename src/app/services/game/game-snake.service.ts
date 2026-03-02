@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Direction } from '../../constants/general/direction.enum';
+import { Direction } from '../../constants/general/direction/direction.enum';
 import { GameBlockType } from '../../constants/game/game-block-type.enum';
 import { PortalType } from '../../constants/portals/portal-type.enum';
 import { SNAKE_PROTECTION_DATA } from '../../constants/snake/snake-protection-data';

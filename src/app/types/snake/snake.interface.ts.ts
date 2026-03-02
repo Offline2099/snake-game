@@ -1,5 +1,5 @@
 
-import { Direction } from '../../constants/general/direction.enum';
+import { Direction } from '../../constants/general/direction/direction.enum';
 import { HeadBlock } from './blocks/head-block.interface';
 import { BodyBlock } from './blocks/body-block.interface';
 import { TailBlock } from './blocks/tail-block.interface';

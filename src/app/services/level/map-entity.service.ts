@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Orientation } from '../../constants/general/orientation.enum';
+import { Orientation } from '../../constants/general/orientation/orientation.enum';
 import { GameBlockType } from '../../constants/game/game-block-type.enum';
 import { ObstacleType } from '../../constants/obstacles/obstacle-type.enum';
 import { PortalType } from '../../constants/portals/portal-type.enum';

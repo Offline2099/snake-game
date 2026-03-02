@@ -1,7 +1,7 @@
 import { Component, computed, model } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
-import { Orientation } from '../../../constants/general/orientation.enum';
+import { Orientation } from '../../../constants/general/orientation/orientation.enum';
 import { AssetPlacingModeId as Mode } from '../../../constants/editor/asset-placing-mode-id.enum';
 import { ASSET_PLACING_MODE_LIST } from '../../../constants/editor/asset-placing-modes';
 import { GameBlockType as AssetType } from '../../../constants/game/game-block-type.enum';

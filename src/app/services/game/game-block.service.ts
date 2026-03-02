@@ -105,7 +105,7 @@ export class GameBlockService {
     return a.type === b.type && a.subType === b.subType;
   }
 
-  blockTypeName(type: GameBlockType): string {
+  private blockTypeName(type: GameBlockType): string {
     return BLOCK_TYPE_NAME[type];
   }
 

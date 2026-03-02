@@ -157,7 +157,7 @@ export class LevelService {
 
   private resolveAreaOverlapWithEntities(map: LevelMapData, area: LevelMapArea): void {
     if (!map.entities) return;
-    this.geometry.positionsWithinArea(area.rectangle).forEach(position => 
+    this.geometry.positionsWithinRectangle(area.rectangle).forEach(position => 
       this.removeMapEntity(map, position)
     );
   }
@@ -260,7 +260,7 @@ export class LevelService {
 
   private resolveWallOverlapWithEntities(map: LevelMapData, wall: Wall): void {
     if (!map.entities) return;
-    this.geometry.positionsWithinArea(wall.rectangle).forEach(position => 
+    this.geometry.positionsWithinRectangle(wall.rectangle).forEach(position => 
       this.removeMapEntity(map, position)
     );
   }
