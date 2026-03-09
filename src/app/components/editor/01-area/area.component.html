@@ -78,7 +78,7 @@
       'horizontal': orientation === Orientation.horizontal,
       'vertical': orientation === Orientation.vertical
     }">
-    @for (block of [].constructor(AREA_SIZE); track $index) {
+    @for (block of [].constructor(orientation === Orientation.horizontal ? SPACE_WIDTH : SPACE_HEIGHT); track $index) {
       <span
         [ngClass]="{ 
           'match': mousePosition() !== null &&
@@ -96,8 +96,7 @@
   <app-asset-block
     class="game-block temporary"
     [ngClass]="{ 'temporary': isTemporary }"
-    [type]="entity.block.type"
-    [subType]="entity.block.subType"
+    [block]="entity.block"
     [ngStyle]="{
       'left.px': BLOCK_SIZE * entity.position.x,
       'bottom.px': BLOCK_SIZE * entity.position.y

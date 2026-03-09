@@ -1,71 +1,71 @@
-import { Component, Signal, Injector, runInInjectionContext, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { timer } from 'rxjs';
-// Constants & Enums
-import { LEVELS } from '../../../constants/levels';
-import { MENU_BG_HUE, LEVEL_BG_HUE_MIN, LEVEL_BG_HUE_RANGE } from '../../../constants/backgrounds';
+import { Component, Signal, signal, computed } from '@angular/core';
 // Interfaces & Types
-import { LevelBase } from '../../../types/level/level-base.interface';
 import { Level } from '../../../types/level/level.interface';
+import { BackgroundSettings } from '../../../types/background/background-settings.interface';
 // Components
 import { BackgroundComponent } from '../../shared/background/background.component';
 import { MenuComponent } from '../01-menu/menu.component';
 import { LevelComponent } from '../02-level/level.component';
 // Services
+import { BackgroundService } from '../../../services/background.service';
 import { ProgressionService } from '../../../services/progression.service';
+import { GameBlockService } from '../../../services/game/game-block.service';
 
 @Component({
   selector: 'app-game',
-  imports: [NgClass, BackgroundComponent, MenuComponent, LevelComponent],
+  imports: [BackgroundComponent, MenuComponent, LevelComponent],
   templateUrl: './game.component.html',
-  styleUrl: './game.component.scss',
+  styleUrl: './game.component.scss'
 })
 export class GameComponent {
 
-  levels: Signal<Level>[];
-  currentLevelIndex: number | null = null;
-  nextLevelId: number | null = null;
+  levels: Signal<Level[]>;
+  currentLevel = signal<Level | null>(null);
+  nextLevelId = computed<number | null>(() => this.getNextLevelId(this.currentLevel()));
+  bgSettings = computed<BackgroundSettings>(() => this.backgroundSettings(this.currentLevel()));
 
-  hue: number = MENU_BG_HUE;
-  isFadingIn = signal<boolean>(false);
+  constructor(
+    private background: BackgroundService,
+    private progression: ProgressionService,
+    private gameBlock: GameBlockService
+    ) {
+    this.levels = this.progression.constructLevels();
+  }
 
-  constructor(private progression: ProgressionService, private injector: Injector) {
-    this.levels = this.progression.constructLevels(LEVELS);
+  ngAfterViewInit(): void {
+    this.preloadAssetImages();
   }
 
   showMenu(): void {
-    this.currentLevelIndex = null;
-    this.updateBackground();
+    this.currentLevel.set(null);
   }
 
-  startLevel(id: number): void {
-    this.currentLevelIndex = this.indexById(id);
-    this.nextLevelId = this.currentLevelIndex === LEVELS.length - 1
-      ? null
-      : LEVELS[this.currentLevelIndex! + 1].id;
-    this.updateBackground();
+  startLevel(level: Level): void {
+    this.currentLevel.set(level);
   }
 
-  indexById(id: number): number | null {
-    const base: LevelBase | undefined = LEVELS.find(level => level.id === id);
-    return base ? LEVELS.indexOf(base) : null;
+  getNextLevelId(currentLevel: Level | null): number | null {
+    if (!currentLevel) return null;
+    return this.progression.nextLevelId(currentLevel.id);
   }
 
-  updateBackground(): void {
-    this.isFadingIn.set(true);
-    timer(600).subscribe(() => this.isFadingIn.set(false));
-    this.hue = this.currentLevelIndex === null
-      ? MENU_BG_HUE
-      : LEVEL_BG_HUE_MIN + 
-        LEVEL_BG_HUE_RANGE * (LEVELS[this.currentLevelIndex!].id - 1) / LEVELS.length;
+  backgroundSettings(currentLevel: Level | null): BackgroundSettings {
+    const currentIndex: number | null = currentLevel !== null 
+      ? this.progression.levelIndex(currentLevel.id) 
+      : null;
+    return this.background.settings(this.progression.levelsTotal(), currentIndex);
   }
 
   onVictory(): void {
-    if (this.currentLevelIndex === null || !this.nextLevelId) return;
-    runInInjectionContext(this.injector, () => {
-      this.levels[this.currentLevelIndex! + 1] = 
-        this.progression.constructLevel(LEVELS[this.currentLevelIndex! + 1]);
-    });    
-  }
+    if (!this.nextLevelId()) return;
+    this.progression.updateLevel(this.nextLevelId()!); 
+  } 
 
+  preloadAssetImages(): void {
+    this.gameBlock.allBlockImages().forEach(url => {
+      const image = new Image();
+      image.src = url;
+    });
+  }
+  
 }

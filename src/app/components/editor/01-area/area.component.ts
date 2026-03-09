@@ -1,12 +1,12 @@
 import { Component, signal, effect, model } from '@angular/core';
 import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
-import { Orientation } from '../../../constants/general/orientation/orientation.enum';
-import { AREA_SIZE, BLOCK_SIZE } from '../../../constants/game/game-area';
+import { Orientation } from '../../../constants/general/orientation.enum';
+import { SPACE_HEIGHT, SPACE_WIDTH, BLOCK_SIZE_PX } from '../../../constants/game/game-space';
 import { AssetPlacingModeId as Mode } from '../../../constants/editor/asset-placing-mode-id.enum';
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { ObstacleType } from '../../../constants/obstacles/obstacle-type.enum';
-import { PortalType } from '../../../constants/portals/portal-type.enum';
+import { GameBlockType } from '../../../constants/game/space-block/game-block-type.enum';
+import { ObstacleType } from '../../../constants/game/obstacles/obstacle-type.enum';
+import { PortalType } from '../../../constants/game/portals/portal-type.enum';
 // Interfaces & Types
 import { Position } from '../../../types/general/position.interface';
 import { Rectangle } from '../../../types/general/rectangle.interface';
@@ -14,8 +14,8 @@ import { Portal } from '../../../types/general/portal.interface';
 import { LevelData } from '../../../types/level/level-data.interface';
 import { LevelMapData } from '../../../types/level/map/level-map-data.interface';
 import { Wall } from '../../../types/level/map/wall.interface';
-import { EntityData } from '../../../types/level/entity-data.interface';
-import { GameBlockBase } from '../../../types/game/space/game-block-base.interface';
+import { EntityData } from '../../../types/level/map/entity-data.interface';
+import { GameBlock } from '../../../types/game/space-block/game-block.interface';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
 import { TooltipComponent } from '../04-tooltip/tooltip.component';
@@ -36,15 +36,16 @@ const TOOLTIP_SHIFT_PX: number = 30;
 })
 export class AreaComponent {
 
-  readonly AREA_SIZE = AREA_SIZE;
-  readonly BLOCK_SIZE = BLOCK_SIZE;
+  readonly SPACE_WIDTH = SPACE_WIDTH;
+  readonly SPACE_HEIGHT = SPACE_HEIGHT;
+  readonly BLOCK_SIZE = BLOCK_SIZE_PX;
   readonly Orientation = Orientation;
   readonly TOOLTIP_SHIFT_PX = TOOLTIP_SHIFT_PX;
   readonly GameBlockType = GameBlockType;
   readonly PortalType = PortalType;
 
   level = model.required<LevelData>();
-  selectedAsset = model.required<GameBlockBase>();
+  selectedAsset = model.required<GameBlock>();
   selectedMode = model.required<Mode>();
   previousMode = model.required<Mode>();
 
@@ -110,8 +111,8 @@ export class AreaComponent {
       return;
     }
     const postition: Position = {
-      x: Math.floor(pixelPosition.x / BLOCK_SIZE),
-      y: AREA_SIZE - Math.ceil(pixelPosition.y / BLOCK_SIZE)
+      x: Math.floor(pixelPosition.x / BLOCK_SIZE_PX),
+      y: SPACE_HEIGHT - Math.ceil(pixelPosition.y / BLOCK_SIZE_PX)
     };
     const current: Position | null = this.mousePosition();
     if (current && this.geometry.isSamePosition(current, postition)) return;
@@ -126,7 +127,7 @@ export class AreaComponent {
     const map: LevelMapData = this.level().map || {};
     const anchor: Position | null = this.actionAnchor;
     const mouse: Position = this.mousePosition()!;
-    const block: GameBlockBase = this.selectedAsset();
+    const block: GameBlock = this.selectedAsset();
     switch (this.selectedMode()) {
       case Mode.single:
         this.addEntityAtPosition(map, mouse, block);
@@ -179,7 +180,7 @@ export class AreaComponent {
     this.actionEntities = [entity];
   }
 
-  updateActionEntities(mode: Mode, anchor: Position, mouse: Position, block: GameBlockBase): void {
+  updateActionEntities(mode: Mode, anchor: Position, mouse: Position, block: GameBlock): void {
     switch (mode) {
       case Mode.area:
         this.updateAreaActionEntities(anchor, mouse, block);
@@ -208,7 +209,7 @@ export class AreaComponent {
   //  Single Position
   //===========================================================================
 
-  addEntityAtPosition(map: LevelMapData, position: Position, block: GameBlockBase): void {
+  addEntityAtPosition(map: LevelMapData, position: Position, block: GameBlock): void {
     this.levelService.addMapEntity(map, position, block);
     this.mapEntity.addEntityToArray(this.levelMapEntities, position, block);
   }
@@ -222,17 +223,17 @@ export class AreaComponent {
   //  Areas
   //===========================================================================
   
-  beginAreaSelection(position: Position, block: GameBlockBase): void {
+  beginAreaSelection(position: Position, block: GameBlock): void {
     this.beginAction(position, { position, block });
   }
 
-  endAreaSelection(map: LevelMapData, anchor: Position, mouse: Position, block: GameBlockBase): void {
+  endAreaSelection(map: LevelMapData, anchor: Position, mouse: Position, block: GameBlock): void {
     const area: Rectangle = this.geometry.rectangleFromTwoPoints(anchor, mouse);
     this.levelService.addMapArea(map, area, block);
     this.endAction();
   }
 
-  updateAreaActionEntities(anchor: Position, mouse: Position, block: GameBlockBase): void {
+  updateAreaActionEntities(anchor: Position, mouse: Position, block: GameBlock): void {
     const area: Rectangle = this.geometry.rectangleFromTwoPoints(anchor, mouse);
     this.actionEntities = this.geometry.positionsWithinRectangle(area)
       .map(position => ({ position, block }));
@@ -246,7 +247,7 @@ export class AreaComponent {
     this.beginAction(position, this.mapEntity.rockEntity(position));
   }
 
-  endWallSetup(map: LevelMapData, anchor: Position, mouse: Position, block: GameBlockBase): void {
+  endWallSetup(map: LevelMapData, anchor: Position, mouse: Position, block: GameBlock): void {
     const orientation: Orientation = this.wallService.orientationByBodyBlock(block);
     const start: Position = this.wallStartPosition(anchor, mouse, orientation);
     const end: Position = this.wallEndPosition(anchor, mouse, orientation);
@@ -260,7 +261,7 @@ export class AreaComponent {
     this.endAction();
   }
 
-  updateWallActionEntities(anchor: Position, mouse: Position, block: GameBlockBase): void {
+  updateWallActionEntities(anchor: Position, mouse: Position, block: GameBlock): void {
     const orientation: Orientation = this.wallService.orientationByBodyBlock(block);
     const start: Position = this.wallStartPosition(anchor, mouse, orientation);
     const end: Position = this.wallEndPosition(anchor, mouse, orientation);
@@ -297,7 +298,7 @@ export class AreaComponent {
   //  Portals
   //===========================================================================
 
-  beginPortalSetup(position: Position, block: GameBlockBase): void {
+  beginPortalSetup(position: Position, block: GameBlock): void {
     this.beginAction(position, { position, block });
     this.selectedAsset.set(this.gameBlock.portalExit());
   }
@@ -310,7 +311,7 @@ export class AreaComponent {
     this.selectedAsset.set(this.gameBlock.portalEntrance());
   }
 
-  updatePortalActionEntities(anchor: Position, mouse: Position, block: GameBlockBase): void {
+  updatePortalActionEntities(anchor: Position, mouse: Position, block: GameBlock): void {
     const entrance: EntityData = { position: anchor, block: this.gameBlock.portalEntrance(mouse) };
     const exit: EntityData = { position: mouse, block };
     this.actionEntities = this.geometry.isSamePosition(anchor, mouse) ? [entrance] : [entrance, exit];

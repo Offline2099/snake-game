@@ -1,4 +1,4 @@
-import { Component, Signal, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Level } from '../../../types/level/level.interface';
 import { SecondsAsTimePipe } from '../../../pipes/seconds-as-time.pipe';
@@ -11,12 +11,11 @@ import { SecondsAsTimePipe } from '../../../pipes/seconds-as-time.pipe';
 })
 export class MenuComponent {
 
-  levels = input.required<Signal<Level>[]>();
+  levels = input.required<Level[]>();
+  select = output<Level>();
 
-  selected = output<number>();
-
-  selectLevel(id: number): void {
-    this.selected.emit(id);
+  selectLevel(level: Level): void {
+    this.select.emit(level);
   }
 
 }

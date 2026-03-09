@@ -1,4 +1,4 @@
-import { Direction } from '../../constants/general/direction/direction.enum';
+import { Direction } from '../../constants/general/direction.enum';
 import { Position } from '../general/position.interface';
 
 export interface SnakeOptions {

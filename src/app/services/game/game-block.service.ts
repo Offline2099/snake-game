@@ -1,23 +1,25 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { DEFAULT_GAME_BLOCK } from '../../constants/game/delault-game-block';
-import { GameBlockType } from '../../constants/game/game-block-type.enum';
-import { BLOCK_TYPE_NAME } from '../../constants/game/block-type-name';
-import { ObstacleType } from '../../constants/obstacles/obstacle-type.enum';
-import { PortalType } from '../../constants/portals/portal-type.enum';
-import { EnemyType } from '../../constants/enemies/enemy-type.enum';
-import { FoodType } from '../../constants/food/food-type.enum';
-import { OBSTACLE_NAME } from '../../constants/obstacles/obstacle-name';
-import { PORTAL_BLOCK_NAME } from '../../constants/portals/portal-block-name';
-import { ENEMY_DATA } from '../../constants/enemies/enemy-data';
-import { FOOD_DATA } from '../../constants/food/food-data';
+import { GameBlockType } from '../../constants/game/space-block/game-block-type.enum';
+import { ObstacleType } from '../../constants/game/obstacles/obstacle-type.enum';
+import { PortalType } from '../../constants/game/portals/portal-type.enum';
+import { EnemyType } from '../../constants/game/enemies/enemy-type.enum';
+import { FoodType } from '../../constants/game/food/food-type.enum';
+import { ProtectionType } from '../../constants/game/space-protection/protection-type.enum';
+import { BLOCK_TYPE_NAME } from '../../constants/game/space-block/block-type-name';
+import { BLOCK_CLASS } from '../../constants/game/space-block/block-class';
+import { BLOCK_IMAGE } from '../../constants/game/space-block/block-image';
+import { OBSTACLE_NAME } from '../../constants/game/obstacles/obstacle-name';
+import { PORTAL_BLOCK_NAME } from '../../constants/game/portals/portal-block-name';
+import { ENEMY_DATA } from '../../constants/game/enemies/enemy-data';
+import { FOOD_DATA } from '../../constants/game/food/food-data';
 // Interfaces & Types
 import { Position } from '../../types/general/position.interface';
-import { GameBlockBase } from '../../types/game/space/game-block-base.interface';
-import { GameBlockData } from '../../types/game/space/game-block-data.interface';
-import { GameBlockSubType } from '../../types/game/space/game-block-subtype.type';
-import { Protection } from '../../types/game/space/protection.type';
-import { ProtectionType } from '../../constants/game/protection-type.enum';
+import { GameBlock } from '../../types/game/space-block/game-block.interface';
+import { GameBlockSubType } from '../../types/game/space-block/game-block-subtype.type';
+import { Protection } from '../../types/game/space-protection/protection.type';
+
+const BLOCK_IMAGE_PATH: string = 'images/game-blocks/';
 
 @Injectable({
   providedIn: 'root'
@@ -28,21 +30,11 @@ export class GameBlockService {
   //  Construction
   //===========================================================================
 
-  defaultBlock(): GameBlockData {
-    return {
-      ...DEFAULT_GAME_BLOCK, isProtected: { ...DEFAULT_GAME_BLOCK.isProtected }
-    }
+  createBlock(type: GameBlockType, subType?: GameBlockSubType, isProtected?: Protection): GameBlock {
+    return { type, subType, isProtected };
   }
 
-  createBlock(type: GameBlockType, subType?: GameBlockSubType, protection?: Protection): GameBlockData {
-    return {
-      type,
-      subType,
-      isProtected: protection ? { ...protection } : { ...DEFAULT_GAME_BLOCK.isProtected }
-    }
-  }
-
-  obstacle(obstacleType: ObstacleType): GameBlockBase {
+  obstacle(obstacleType: ObstacleType): GameBlock {
     return { type: GameBlockType.obstacle, subType : obstacleType };
   }
 
@@ -50,11 +42,19 @@ export class GameBlockService {
     return Object.values(ObstacleType).filter(Number) as ObstacleType[];
   }
 
-  allObstacles(): GameBlockBase[] {
+  allObstacles(): GameBlock[] {
     return this.allObstacleTypes().map(type => this.obstacle(type));
   }
 
-  enemy(enemyType: EnemyType): GameBlockBase {
+  portalEntrance(to?: Position): GameBlock {
+    return { type: GameBlockType.portal, subType: PortalType.entrance, portalTo: to };
+  }
+
+  portalExit(): GameBlock {
+    return { type: GameBlockType.portal, subType: PortalType.exit };
+  }
+
+  enemy(enemyType: EnemyType): GameBlock {
     return { type: GameBlockType.enemy, subType : enemyType };
   }
 
@@ -62,11 +62,11 @@ export class GameBlockService {
     return Object.values(EnemyType).filter(Number) as EnemyType[];
   }
 
-  allEnemies(): GameBlockBase[] {
+  allEnemies(): GameBlock[] {
     return this.allEnemyTypes().map(type => this.enemy(type));
   }
 
-  food(foodType: FoodType): GameBlockBase {
+  food(foodType: FoodType): GameBlock {
     return { type: GameBlockType.food, subType : foodType };
   }
 
@@ -74,50 +74,59 @@ export class GameBlockService {
     return Object.values(FoodType).filter(Number) as FoodType[];
   }
 
-  allFood(): GameBlockBase[] {
+  allFood(): GameBlock[] {
     return this.allFoodTypes().map(type => this.food(type));
   }
 
-  portalEntrance(to?: Position): GameBlockBase {
-    return { type: GameBlockType.portal, subType: PortalType.entrance, portalTo: to };
+  protectionTypes(): ProtectionType[] {
+    return Object.values(ProtectionType).filter(Number) as ProtectionType[];
   }
 
-  portalExit(): GameBlockBase {
-    return { type: GameBlockType.portal, subType: PortalType.exit };
-  }
-
-  createPortalBlock(portalType: PortalType): GameBlockData {
-    return {
-      type: GameBlockType.portal,
-      subType: portalType,
-      isProtected: {
-        [ProtectionType.noEnemySpawn]: true,
-        [ProtectionType.noFoodSpawn]: true
-      }
-    }
+  blockProtection(): Protection {
+    return this.protectionTypes().reduce((acc, type) => {
+      acc[type] = false;
+      return acc;
+    }, {} as Protection);
   }
 
   //===========================================================================
   //  Queries
   //===========================================================================
 
-  areBlocksEqual(a: GameBlockBase, b: GameBlockBase): boolean {
+  areBlocksEqual(a: GameBlock, b: GameBlock): boolean {
     return a.type === b.type && a.subType === b.subType;
   }
 
-  private blockTypeName(type: GameBlockType): string {
-    return BLOCK_TYPE_NAME[type];
+  isFood(block: GameBlock | null): boolean {
+    if (!block) return false;
+    return block.type === GameBlockType.food;
   }
 
-  blockName(block: GameBlockBase, omitTypeName: boolean = false): string {
-    const typeName: string = this.blockTypeName(block.type);
+  isEnemy(block: GameBlock | null): boolean {
+    if (!block) return false;
+    return block.type === GameBlockType.enemy;
+  }
+  
+  isCausingCollision(block: GameBlock | null): boolean {
+    return block
+      ? block.type === GameBlockType.obstacle
+        || block.type === GameBlockType.snakeHead
+        || block.type === GameBlockType.snakeBody
+      : true;
+  }
+
+  blockName(block: GameBlock, omitTypeName: boolean = false): string {
+    const typeName: string = BLOCK_TYPE_NAME[block.type];
+    let separator: string = ':';
     let subTypeName = '';
     switch (block.type) {
       case GameBlockType.obstacle:
         subTypeName = OBSTACLE_NAME[block.subType as ObstacleType];
         break;
       case GameBlockType.portal:
-        return `${typeName} ${PORTAL_BLOCK_NAME[block.subType  as PortalType]}`;
+        subTypeName = PORTAL_BLOCK_NAME[block.subType as PortalType];
+        separator = '';
+        break;
       case GameBlockType.enemy:
         subTypeName = ENEMY_DATA[block.subType as EnemyType].name;
         break;
@@ -125,7 +134,35 @@ export class GameBlockService {
         subTypeName = FOOD_DATA[block.subType as FoodType].name;
         break;
     }
-    return omitTypeName ? subTypeName : `${typeName}: ${subTypeName}`;
+    return omitTypeName ? subTypeName : `${typeName}${separator} ${subTypeName}`;
+  }
+
+  blockClass(block: GameBlock): string {
+    return block.subType !== undefined ? BLOCK_CLASS[block.type][block.subType] : '';
+  }
+
+  blockImage(block: GameBlock): string | null {
+    return BLOCK_IMAGE[block.type]
+      ? typeof BLOCK_IMAGE[block.type] === 'string'
+        ? this.blockImageURL(BLOCK_IMAGE[block.type] as string)
+        : block.subType
+          ? this.blockImageURL(BLOCK_IMAGE[block.type][block.subType])
+          : null 
+      : null;
+  }
+
+  allBlockImages(): string[] {
+    const images: string[] = [];
+    Object.values(BLOCK_IMAGE).forEach(value =>
+      typeof value === 'string' 
+        ? images.push(value) 
+        : images.push(...Object.values(value))
+    );
+    return [...new Set(images)].map(name => this.blockImageURL(name));
+  }
+
+  private blockImageURL(name: string): string {
+    return `${BLOCK_IMAGE_PATH}${name}.svg`;
   }
 
 }

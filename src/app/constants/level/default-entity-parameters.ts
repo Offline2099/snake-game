@@ -1,6 +1,6 @@
-import { EntityParameterId } from './entity-parameter-id.enum';
+import { EntityParameterId as Parameter } from './entity-parameter-id.enum';
 
-export const DEFAULT_ENTITY_PARAMETERS: Record<EntityParameterId, number> = {
-  [EntityParameterId.initialAmount]: 0,
-  [EntityParameterId.spawnOnInteraction]: 0
+export const DEFAULT_ENTITY_PARAMETERS: Record<Parameter, number> = {
+  [Parameter.initialAmount]: 0,
+  [Parameter.spawnOnInteraction]: 0
 }

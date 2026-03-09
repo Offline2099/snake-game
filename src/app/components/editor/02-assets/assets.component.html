@@ -84,7 +84,7 @@
             && !isButtonActive()
         }"
         (click)="pickAsset(asset)">
-        <app-asset-block [type]="asset.type" [subType]="asset.subType" />
+        <app-asset-block [block]="asset" />
       </div>
     }
   </section>

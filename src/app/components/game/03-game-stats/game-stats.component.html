@@ -3,7 +3,7 @@
 <div class="section">
   <div class="section-line">
     <span>Elapsed time:</span>
-    <span>{{game().stats.elapsedTime | secondsAsTime }}</span>
+    <span>{{ game().stats.elapsedTime | secondsAsTime }}</span>
   </div>
 </div>
 
@@ -18,8 +18,8 @@
   <div class="section-line"> 
     <span>Snake length:</span>
     <span>
-      <ng-container>{{ snake().body.length + 2 }}</ng-container>
-      @if (game().delayedGrowth;as growth) {
+      <ng-container>{{ game().snake.body.length + 2 }}</ng-container>
+      @if (game().delayedGrowth; as growth) {
         <ng-container> (+{{ growth }})</ng-container>
       }
     </span>
@@ -51,7 +51,7 @@
       @if (game().stats.food[foodType].present || game().stats.food[foodType].consumed) {
         <tr>
           <td>
-            <app-asset-block [type]="GameBlockType.food" [subType]="foodType" />
+            <app-asset-block [block]="{ type: GameBlockType.food, subType: foodType }" />
             <span>{{ FOOD_DATA[foodType].name }}</span>
           </td>
           <td>{{ game().stats.food[foodType].present }}</td>
@@ -89,7 +89,7 @@
         @if (game().stats.enemies[enemyType].present || game().stats.enemies[enemyType].hit) {
           <tr>
             <td>
-              <app-asset-block [type]="GameBlockType.enemy" [subType]="enemyType" />
+              <app-asset-block [block]="{ type: GameBlockType.food, subType: enemyType }" />
               <span>{{ ENEMY_DATA[enemyType].name }}</span>
             </td>
             <td>{{ game().stats.enemies[enemyType].present }}</td>
@@ -101,4 +101,3 @@
     </table>
   </div>
 }
-

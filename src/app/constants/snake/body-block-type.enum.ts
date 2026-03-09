@@ -1,5 +1,5 @@
 export enum BodyBlockType {
-  horizontal,
+  horizontal = 1,
   vertical,
   betweenTopAndLeft,
   betweenTopAndRight,

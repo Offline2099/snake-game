@@ -1,4 +1,4 @@
-import { ProtectionType } from '../../constants/game/protection-type.enum';
+import { ProtectionType } from '../../constants/game/space-protection/protection-type.enum';
 
 export interface SnakeProtectionData {
   type: ProtectionType;

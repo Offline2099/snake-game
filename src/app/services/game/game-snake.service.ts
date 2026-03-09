@@ -1,23 +1,21 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Direction } from '../../constants/general/direction/direction.enum';
-import { GameBlockType } from '../../constants/game/game-block-type.enum';
-import { PortalType } from '../../constants/portals/portal-type.enum';
+import { Direction } from '../../constants/general/direction.enum';
+import { GameBlockType } from '../../constants/game/space-block/game-block-type.enum';
+import { PortalType } from '../../constants/game/portals/portal-type.enum';
 import { SNAKE_PROTECTION_DATA } from '../../constants/snake/snake-protection-data';
 // Interfaces & Types
 import { Position } from '../../types/general/position.interface';
 import { Rectangle } from '../../types/general/rectangle.interface';
-import { Game } from '../../types/game/game.interface';
 import { Level } from '../../types/level/level.interface';
-import { Snake } from '../../types/snake/snake.interface.ts';
-import { Space } from '../../types/game/space/space.type';
-import { GameBlockData } from '../../types/game/space/game-block-data.interface';
+import { Snake } from '../../types/snake/snake.interface';
+import { Space } from '../../types/game/space.type';
+import { GameBlock } from '../../types/game/space-block/game-block.interface';
 // Services
 import { GeometryService } from '../general/geometry.service';
-import { SpaceService } from '../space.service';
-import { GameSpaceService } from './game-space.service';
-import { SnakeService } from '../snake.service';
 import { GameBlockService } from './game-block.service';
+import { SnakeService } from './snake.service';
+import { SpaceService } from './space.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,15 +24,18 @@ export class GameSnakeService {
 
   constructor(
     private geometry: GeometryService,
-    private spaceService: SpaceService,
     private gameBlock: GameBlockService,
-    private gameSpace: GameSpaceService,
-    private snakeService: SnakeService
+    private snakeService: SnakeService,
+    private spaceService: SpaceService
   ) {}
 
   //===========================================================================
   //  Snake Setup
   //===========================================================================
+
+  createSnake(): Snake {
+    return this.snakeService.createSnake();
+  }
 
   setSnake(space: Space, snake: Snake): void {
     this.setSnakeHead(space, snake);
@@ -43,28 +44,28 @@ export class GameSnakeService {
     this.protectSnake(space, snake);
   }
 
-  private setSnakeBlock(space: Space, position: Position, block: GameBlockData): void {
+  private setSnakeBlock(space: Space, position: Position, block: GameBlock): void {
     if (this.spaceService.isOfType(space, position, GameBlockType.portal, PortalType.entrance)) 
       return;
     this.spaceService.setBlock(space, position, block);
   }
 
   private setSnakeHead(space: Space, snake: Snake): void {
-    const head: GameBlockData = 
+    const head: GameBlock = 
       this.gameBlock.createBlock(GameBlockType.snakeHead, snake.head.currentDirection);
     this.setSnakeBlock(space, snake.head.currentPosition, head);
   }
 
   private setSnakeBody(space: Space, snake: Snake): void {
-    snake.body.forEach(block => {
-      const blockData: GameBlockData = 
-        this.gameBlock.createBlock(GameBlockType.snakeBody, block.type);
-      this.setSnakeBlock(space, block.currentPosition, blockData);
+    snake.body.forEach(bodyBlock => {
+      const block: GameBlock = 
+        this.gameBlock.createBlock(GameBlockType.snakeBody, bodyBlock.type);
+      this.setSnakeBlock(space, bodyBlock.currentPosition, block);
     });
   }
 
   private setSnakeTail(space: Space, snake: Snake): void {
-    const tail: GameBlockData = 
+    const tail: GameBlock = 
       this.gameBlock.createBlock(GameBlockType.snakeTail, snake.tail.currentDirection);
     this.setSnakeBlock(space, snake.tail.currentPosition, tail);
   }
@@ -72,13 +73,14 @@ export class GameSnakeService {
   private protectSnake(space: Space, snake: Snake): void {
     const path: Rectangle = 
       this.snakeService.snakePathAhead(snake, SNAKE_PROTECTION_DATA.pathLength);
-    this.gameSpace.protectArea(space, path, SNAKE_PROTECTION_DATA.type);
+    this.spaceService.setAreaProtectionState(space, path, SNAKE_PROTECTION_DATA.type, true);
     this.snakeService.allBlocks(snake).forEach(block => 
-      this.gameSpace.protectMargin(
+      this.spaceService.setMarginProtectionState(
         space,
         block.currentPosition,
         SNAKE_PROTECTION_DATA.margin,
-        SNAKE_PROTECTION_DATA.type
+        SNAKE_PROTECTION_DATA.type,
+        true
       )
     );
   }
@@ -87,25 +89,37 @@ export class GameSnakeService {
   //  Snake Update
   //===========================================================================
 
-  turnSnake(game: Game, snake: Snake, direction: Direction): void {
+  positionAhead(snake: Snake): Position {
+    return this.geometry.shiftPosition(snake.head.currentPosition, snake.direction);
+  }
+
+  turnSnake(space: Space, snake: Snake, direction: Direction): void {
     const headPositionIfTurned: Position = 
       this.geometry.shiftPosition(snake.head.currentPosition, direction);
-    if (this.spaceService.isCollisionAhead(game.space, headPositionIfTurned)) return;
+    const block: GameBlock | null = this.spaceService.getBlock(space, headPositionIfTurned);
+    if (this.gameBlock.isCausingCollision(block)) return;
     snake.direction = direction;
   }
 
-  moveSnake(game: Game, level: Level, snake: Snake): void {
-    if (snake.direction !== snake.head.currentDirection) {
+  moveSnake(space: Space, snake: Snake, level: Level, positionAhead: Position): void {
+    if (
+      snake.direction !== snake.head.currentDirection 
+        || this.spaceService.isOfType(space, positionAhead, GameBlockType.portal, PortalType.entrance)
+    ) {
       const path: Rectangle = this.snakeService.snakePathAhead(snake, SNAKE_PROTECTION_DATA.pathLength);
-      this.gameSpace.unprotectArea(game, level, path);
+      this.spaceService.unprotectArea(space, level, path);
     }
-    this.gameSpace.unprotectMargin(game, level, snake.tail.currentPosition, SNAKE_PROTECTION_DATA.margin);
-    this.snakeService.moveSnake(snake, game.portals);
-    this.gameSpace.setFreeBlock(game, level, snake.tail.previousPosition);
-    this.setSnake(game.space, snake);
+    this.spaceService.unprotectMargin(space, level, snake.tail.currentPosition, SNAKE_PROTECTION_DATA.margin);
+    this.snakeService.moveSnake(snake, level.settings.map?.portals || []);
+    this.spaceService.setEmptyBlock(space, level, snake.tail.previousPosition);
+    this.setSnake(space, snake);
   }
 
-  reduceSnake(game: Game, level: Level, snake: Snake, amount: number): void {
+  growSnake(snake: Snake): void {
+    this.snakeService.growSnake(snake);
+  }
+
+  reduceSnake(space: Space, snake: Snake, level: Level, amount: number): void {
     const positionsToCut: Position[] = [
       ...snake.body
         .slice(Math.max(snake.body.length - 1 - amount, 1))
@@ -113,11 +127,11 @@ export class GameSnakeService {
       snake.tail.currentPosition
     ];
     positionsToCut.forEach(position => {
-      this.gameSpace.setFreeBlock(game, level, position);
-      this.gameSpace.unprotectMargin(game, level, position, SNAKE_PROTECTION_DATA.margin);
+      this.spaceService.setEmptyBlock(space, level, position);
+      this.spaceService.unprotectMargin(space, level, position, SNAKE_PROTECTION_DATA.margin);
     });
     this.snakeService.takeDamage(snake, amount);
-    this.setSnake(game.space, snake);
+    this.setSnake(space, snake);
   }
 
 }

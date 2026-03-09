@@ -1,16 +1,16 @@
 import { Component, input, effect } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
 // Constants & Enums
-import { AREA_SIZE, BLOCK_SIZE } from '../../../constants/game/game-area';
+import { BLOCK_SIZE_PX } from '../../../constants/game/game-space';
+import { GameBlockType } from '../../../constants/game/space-block/game-block-type.enum';
 import { GameState } from '../../../constants/game/game-state.enum';
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
 // Interfaces & Types
 import { Position } from '../../../types/general/position.interface';
-import { Space } from '../../../types/game/space/space.type';
+import { Space } from '../../../types/game/space.type';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
 
-const MAX_CHANGES_LENGTH: number = 15;
+const MAX_CHANGE_LENGTH: number = 15;
 
 interface ProgressChange {
   id: number;
@@ -26,52 +26,39 @@ interface ProgressChange {
 })
 export class GameAreaComponent {
 
-  readonly AREA_SIZE = AREA_SIZE;
-  readonly BLOCK_SIZE = BLOCK_SIZE;
-  readonly GameState = GameState;
+  readonly BLOCK_SIZE_PX = BLOCK_SIZE_PX;
   readonly GameBlockType = GameBlockType;
+  readonly GameState = GameState;
 
   space = input.required<Space>();
   gameState = input.required<GameState>();
-  progress = input.required<number>();
+  latestChange = input.required<number>();
   headPosition = input.required<Position>();
 
-  previousProgress!: number;
-  latestChange!: number;
-  latestChangeId!: number;
-  progressChanges!: ProgressChange[];
+  latestChangeId: number = 0;
+  progressChanges: ProgressChange[] = [];
 
   constructor() {
-    this.resetProgressChanges();
     effect(() => 
-      this.updateProgressChanges(this.gameState(), this.progress(), this.headPosition())
+      this.updateProgressChanges(this.gameState(), this.latestChange(), this.headPosition())
     );
   }
 
-  resetProgressChanges(): void {
-    this.previousProgress = 0;
-    this.latestChange = 0;
-    this.latestChangeId = 0;
-    this.progressChanges = [];
-  }
-
-  updateProgressChanges(gameState: GameState, progress: number, position: Position): void {
+  updateProgressChanges(gameState: GameState, latestChange: number, position: Position): void {
     if (gameState === GameState.ready) {
-      this.resetProgressChanges();
+      this.latestChangeId = 0;
+      this.progressChanges = [];
       return;
     }
-    this.latestChange = progress - this.previousProgress;
-    this.previousProgress = progress;
-    if (this.latestChange !== 0) {
+    if (latestChange !== 0) {
       this.latestChangeId++;
       this.progressChanges.push({
         id: this.latestChangeId,
         position: { ...position },
-        value: this.latestChange
+        value: latestChange
       });
     }
-    if (this.progressChanges.length > MAX_CHANGES_LENGTH)
-      this.progressChanges.shift();
+    if (this.progressChanges.length > MAX_CHANGE_LENGTH) this.progressChanges.shift();
   }
 
 }

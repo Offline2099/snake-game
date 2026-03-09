@@ -1,13 +1,13 @@
 import { Component, computed, model } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
-import { Orientation } from '../../../constants/general/orientation/orientation.enum';
+import { Orientation } from '../../../constants/general/orientation.enum';
 import { AssetPlacingModeId as Mode } from '../../../constants/editor/asset-placing-mode-id.enum';
 import { ASSET_PLACING_MODE_LIST } from '../../../constants/editor/asset-placing-modes';
-import { GameBlockType as AssetType } from '../../../constants/game/game-block-type.enum';
-import { ObstacleType } from '../../../constants/obstacles/obstacle-type.enum';
+import { GameBlockType as AssetType } from '../../../constants/game/space-block/game-block-type.enum';
+import { ObstacleType } from '../../../constants/game/obstacles/obstacle-type.enum';
 // Interfaces & Types
-import { GameBlockBase } from '../../../types/game/space/game-block-base.interface';
+import { GameBlock } from '../../../types/game/space-block/game-block.interface';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
 // Services
@@ -27,7 +27,7 @@ export class AssetsComponent {
   readonly AssetType = AssetType;
   readonly ObstacleType = ObstacleType;
 
-  selectedAsset = model.required<GameBlockBase>();
+  selectedAsset = model.required<GameBlock>();
   selectedMode = model.required<Mode>();
   previousMode = model.required<Mode>();
 
@@ -35,9 +35,9 @@ export class AssetsComponent {
     this.selectedMode() === Mode.wall || this.selectedMode() === Mode.portal
   );
 
-  obstacles: GameBlockBase[];
-  enemies: GameBlockBase[];
-  food: GameBlockBase[];
+  obstacles: GameBlock[];
+  enemies: GameBlock[];
+  food: GameBlock[];
 
   constructor(private gameBlock: GameBlockService, private wallService: WallService) {
     this.obstacles = this.gameBlock.allObstacles();
@@ -45,7 +45,7 @@ export class AssetsComponent {
     this.food = this.gameBlock.allFood();
   }
 
-  selectAsset(asset: GameBlockBase): void {
+  selectAsset(asset: GameBlock): void {
     this.selectedAsset.set({ ...asset });
   }
 
@@ -54,7 +54,7 @@ export class AssetsComponent {
     this.selectedMode.set(modeId);
   }
 
-  pickAsset(asset: GameBlockBase): void {
+  pickAsset(asset: GameBlock): void {
     if (this.isButtonActive()) this.selectedMode.set(this.previousMode());
     this.selectAsset(asset);
   }

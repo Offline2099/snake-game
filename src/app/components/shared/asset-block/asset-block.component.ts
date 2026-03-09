@@ -1,28 +1,21 @@
-import { Component, HostBinding, input } from '@angular/core';
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { BodyBlockType } from '../../../constants/snake/body-block-type.enum';
-import { BLOCK_CLASS } from '../../../constants/game/block-class';
-import { GameBlockSubType } from '../../../types/game/space/game-block-subtype.type';
+import { Component, input, computed } from '@angular/core';
+import { GameBlock } from '../../../types/game/space-block/game-block.interface';
+import { GameBlockService } from '../../../services/game/game-block.service';
 
 @Component({
   selector: 'app-asset-block',
+  host: { '[class]': 'blockClass()' },
   imports: [],
   templateUrl: './asset-block.component.html',
   styleUrl: './asset-block.component.scss',
 })
 export class AssetBlockComponent {
 
-  @HostBinding('class') get blockClass(): string {
-    return this.subType() === undefined 
-      ? BLOCK_CLASS[this.type()] as string
-      : BLOCK_CLASS[this.type()][this.subType()!];
-  }
+  block = input.required<GameBlock>();
 
-  readonly GameBlockType = GameBlockType;
-  readonly BodyBlockType = BodyBlockType;
-  readonly BLOCK_CLASS = BLOCK_CLASS;
+  blockClass = computed<string>(() => this.gameBlock.blockClass(this.block()));
+  blockImage = computed<string | null>(() => this.gameBlock.blockImage(this.block()))
 
-  type = input.required<GameBlockType>();
-  subType = input.required<GameBlockSubType | undefined>();
+  constructor(private gameBlock: GameBlockService) {}
 
 }

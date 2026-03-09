@@ -1,17 +1,17 @@
 import { Component, computed, input } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 // Constants & Enums
-import { ORIENTATION } from '../../../constants/general/orientation/orientation';
+import { ORIENTATION } from '../../../constants/general/orientation';
 import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode-id.enum';
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { PortalType } from '../../../constants/portals/portal-type.enum';
+import { GameBlockType } from '../../../constants/game/space-block/game-block-type.enum';
+import { PortalType } from '../../../constants/game/portals/portal-type.enum';
 // Interfaces & Types
 import { Position } from '../../../types/general/position.interface';
 import { Portal } from '../../../types/general/portal.interface';
 import { LevelMapArea } from '../../../types/level/map/level-map-area.interface';
 import { Wall } from '../../../types/level/map/wall.interface';
-import { EntityData } from '../../../types/level/entity-data.interface';
-import { GameBlockBase } from '../../../types/game/space/game-block-base.interface';
+import { EntityData } from '../../../types/level/map/entity-data.interface';
+import { GameBlock } from '../../../types/game/space-block/game-block.interface';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
 // Services
@@ -20,7 +20,7 @@ import { LevelService } from '../../../services/level/level.service';
 import { GameBlockService } from '../../../services/game/game-block.service';
 import { WallService } from '../../../services/level/wall.service';
 
-interface GameBlock extends GameBlockBase {
+interface GameAsset extends GameBlock {
   name: string;
 }
 
@@ -48,11 +48,11 @@ export class TooltipComponent {
   areas = input.required<LevelMapArea[]>();
   portals = input.required<Portal[]>();
   walls = input.required<Wall[]>();
-  asset = input.required<GameBlockBase | null>();
+  asset = input.required<GameBlock | null>();
   mode = input.required<AssetPlacingModeId>();
   isActionInProgress = input.required<boolean>();  
 
-  blockUnderCursor = computed<GameBlock | null>(() => 
+  blockUnderCursor = computed<GameAsset | null>(() => 
     this.updateBlockUnderCursor(this.blocks(), this.cursor())
   );
 
@@ -75,7 +75,7 @@ export class TooltipComponent {
     private wallService: WallService
   ) { }
   
-  updateBlockUnderCursor(blocks: EntityData[], cursor: Position): GameBlock | null {
+  updateBlockUnderCursor(blocks: EntityData[], cursor: Position): GameAsset | null {
     const entity: EntityData | undefined = blocks.find(entity => 
       this.geometry.isSamePosition(entity.position, cursor)
     );

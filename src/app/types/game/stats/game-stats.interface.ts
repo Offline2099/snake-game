@@ -1,5 +1,5 @@
-import { EnemyType } from '../../../constants/enemies/enemy-type.enum';
-import { FoodType } from '../../../constants/food/food-type.enum';
+import { EnemyType } from '../../../constants/game/enemies/enemy-type.enum';
+import { FoodType } from '../../../constants/game/food/food-type.enum';
 import { EnemyStats } from './enemy-stats.interface';
 import { FoodStats } from './food-stats.interface';
 

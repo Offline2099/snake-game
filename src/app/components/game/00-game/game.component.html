@@ -1,12 +1,12 @@
-@if (currentLevelIndex === null) {
-  <app-menu [levels]="levels" (selected)="startLevel($event)" />
+<app-background [settings]="bgSettings()" />
+
+@if (currentLevel() === null) {
+  <app-menu [levels]="levels()" (select)="startLevel($event)" />
 } @else {
   <app-level
-    [level]="levels[currentLevelIndex]()"
-    [nextLevelId]="nextLevelId"
-    (victory)="onVictory()"
+    [level]="currentLevel()!"
+    [nextLevelId]="nextLevelId()"
     (toMenu)="showMenu()"
+    (victory)="onVictory()"
   />
 }
-
-<app-background [hue]="hue" [ngClass]="{ 'fading-in': isFadingIn() }" />

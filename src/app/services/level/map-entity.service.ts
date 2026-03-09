@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Orientation } from '../../constants/general/orientation/orientation.enum';
-import { GameBlockType } from '../../constants/game/game-block-type.enum';
-import { ObstacleType } from '../../constants/obstacles/obstacle-type.enum';
-import { PortalType } from '../../constants/portals/portal-type.enum';
+import { Orientation } from '../../constants/general/orientation.enum';
+import { GameBlockType } from '../../constants/game/space-block/game-block-type.enum';
+import { ObstacleType } from '../../constants/game/obstacles/obstacle-type.enum';
+import { PortalType } from '../../constants/game/portals/portal-type.enum';
 // Interfaces & Types
 import { Position } from '../../types/general/position.interface';
-import { EntityData } from '../../types/level/entity-data.interface';
+import { EntityData } from '../../types/level/map/entity-data.interface';
 import { LevelMapData } from '../../types/level/map/level-map-data.interface';
-import { GameBlockBase } from '../../types/game/space/game-block-base.interface';
+import { GameBlock } from '../../types/game/space-block/game-block.interface';
 // Services
 import { GeometryService } from '../general/geometry.service';
 import { GameBlockService } from '../game/game-block.service';
@@ -55,7 +55,7 @@ export class MapEntityService {
     return array;
   }
 
-  addEntityToArray(array: EntityData[], position: Position, block: GameBlockBase): void {
+  addEntityToArray(array: EntityData[], position: Position, block: GameBlock): void {
     for (const [index, entity] of array.entries()) {
       if (this.geometry.isSamePosition(entity.position, position)) {
         if (entity.block.type === GameBlockType.portal) {
@@ -110,7 +110,7 @@ export class MapEntityService {
     return { position, block: this.wallService.endBlock(orientation) };
   }
 
-  wallBodyEtities(start: Position, end: Position, block: GameBlockBase): EntityData[] {
+  wallBodyEtities(start: Position, end: Position, block: GameBlock): EntityData[] {
     switch (block.subType) {
       case ObstacleType.wallHorizontal:
         return Array.from({ length: end.x - start.x - 1 }, (_, index) => ({ 

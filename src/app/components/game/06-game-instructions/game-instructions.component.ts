@@ -1,75 +1,22 @@
 import { Component, computed, input } from '@angular/core';
 // Constants & Enums
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { FoodType } from '../../../constants/food/food-type.enum';
-import { EnemyType } from '../../../constants/enemies/enemy-type.enum';
-import { FOOD_DATA } from '../../../constants/food/food-data';
-import { ENEMY_DATA } from '../../../constants/enemies/enemy-data';
-// Inerfaces & Types
+import { GameBlockType } from '../../../constants/game/space-block/game-block-type.enum';
+import { InstructionPartType } from '../../../constants/instructions/instruction-part-type.enum';
+import { INSTRUCTIONS_KB_KEY } from '../../../constants/instructions/instructions-keb-key';
+import { INSTRUCTIONS_BUTTON } from '../../../constants/instructions/instructions-button';
+import { INSTRUCTIONS_ASSET_TYPE } from '../../../constants/instructions/instructions-asset-type';
+import { INSTRUCTIONS_ENEMY_TYPE } from '../../../constants/instructions/instructions-enemy-type';
+import { INSTRUCTIONS_FOOD_TYPE } from '../../../constants/instructions/instructions-food-type';
+// Interfaces & Types
 import { Level } from '../../../types/level/level.interface';
-import { GameBlockSubType } from '../../../types/game/space/game-block-subtype.type';
+import { Instruction } from '../../../types/instructions/instruction.type';
+import { InstructionPart } from '../../../types/instructions/instruction-part.type';
+import { PartAsset } from '../../../types/instructions/part-asset.interface';
+import { GameBlockSubType } from '../../../types/game/space-block/game-block-subtype.type';
 // Components
 import { AssetBlockComponent } from '../../shared/asset-block/asset-block.component';
-
-enum InstructionPartType {
-  key = 'key',
-  button = 'button',
-  asset = 'asset'
-}
-
-interface InstructionPartKey {
-  type: InstructionPartType.key,
-  icon: string;
-  name: string;
-}
-
-interface InstructionPartButton {
-  type: InstructionPartType.button,
-  icon: string;
-  name: string;
-}
-
-interface InstructionPartAsset {
-  type: InstructionPartType.asset,
-  assetType: GameBlockType;
-  assetSubType: GameBlockSubType;
-  assetName: string;
-}
-
-type InstructionPart = string | InstructionPartKey | InstructionPartButton | InstructionPartAsset;
-type Instruction = InstructionPart[];
-
-const KB_KEYS: Record<string, InstructionPartKey> = {
-  ['space']: {
-    type: InstructionPartType.key,
-    icon: 'space',
-    name: 'Space'
-  }
-}
-
-const BUTTONS: Record<string, InstructionPartButton> = {
-  ['start']: {
-    type: InstructionPartType.button,
-    icon: 'start',
-    name: 'Start'
-  }
-}
-
-const ASSET_TYPE_MAP: Record<string, GameBlockType> = {
-  ['food']: GameBlockType.food,
-  ['enemy']: GameBlockType.enemy
-}
-
-const FOOD_TYPE_MAP: Record<string, GameBlockSubType> = {
-  ['normal']: FoodType.normal,
-  ['yummy']: FoodType.yummy,
-  ['delicious']: FoodType.delicious
-}
-
-const ENEMY_TYPE_MAP: Record<string, GameBlockSubType> = {
-  ['shit']: EnemyType.shit,
-  ['fire']: EnemyType.fire
-}
+// Services
+import { GameBlockService } from '../../../services/game/game-block.service';
 
 @Component({
   selector: 'app-game-instructions',
@@ -79,7 +26,7 @@ const ENEMY_TYPE_MAP: Record<string, GameBlockSubType> = {
 })
 export class GameInstructionsComponent {
 
-  readonly InstructionPartType = InstructionPartType;
+  readonly InstructionPartType= InstructionPartType;
 
   level = input.required<Level>();
 
@@ -87,21 +34,21 @@ export class GameInstructionsComponent {
     this.parseInstructions(this.level().settings.instructions)
   );
 
+  constructor(private gameBlock: GameBlockService) {}
+
   parseInstructions(instructionsAsStrings: string[]): Instruction[] {
     return instructionsAsStrings.map(instruction => 
-      instruction
-        .split(/[\[\]]/)
-        .map(part => this.convertStringToInstructionPart(part as string))
+      instruction.split(/[\[\]]/).map(part => this.parseInstructionPart(part))
     );
   }
 
-  convertStringToInstructionPart(string: string): InstructionPart {
+  parseInstructionPart(string: string): InstructionPart {
     const [partType, entityType, entitySubType]: string[] = string.split('|');
     switch (partType) {
       case InstructionPartType.key:
-        return KB_KEYS[entityType] || string;
+        return INSTRUCTIONS_KB_KEY[entityType] || string;
       case InstructionPartType.button:
-        return BUTTONS[entityType] || string;
+        return INSTRUCTIONS_BUTTON[entityType] || string;
       case InstructionPartType.asset:
         return this.parseAsset(entityType, entitySubType) || string;
       default:
@@ -109,30 +56,18 @@ export class GameInstructionsComponent {
     }
   }
 
-  parseAsset(typeString: string, subTypeString: string): InstructionPartAsset | null {
-    if (!Object.keys(ASSET_TYPE_MAP).includes(typeString)) return null;
-    const type: GameBlockType = ASSET_TYPE_MAP[typeString];
+  parseAsset(typeString: string, subTypeString: string): PartAsset | null {
+    if (!Object.keys(INSTRUCTIONS_ASSET_TYPE).includes(typeString)) return null;
+    const type: GameBlockType = INSTRUCTIONS_ASSET_TYPE[typeString];
     let subType: GameBlockSubType | null = null;
-    if (type === GameBlockType.food) subType = FOOD_TYPE_MAP[subTypeString];
-    if (type === GameBlockType.enemy) subType = ENEMY_TYPE_MAP[subTypeString];
+    if (type === GameBlockType.food) subType = INSTRUCTIONS_FOOD_TYPE[subTypeString];
+    if (type === GameBlockType.enemy) subType = INSTRUCTIONS_ENEMY_TYPE[subTypeString];
     if (subType === null) return null;
     return {
       type: InstructionPartType.asset,
-      assetType: type,
-      assetSubType: subType,
-      assetName: this.assetName(type, subType as GameBlockSubType)
-    } as InstructionPartAsset;
-  }
-
-  assetName(type: GameBlockType, subType?: GameBlockSubType): string {
-    switch (type) {
-      case GameBlockType.food:
-        return FOOD_DATA[subType as FoodType].name;
-      case GameBlockType.enemy:
-        return ENEMY_DATA[subType as EnemyType].name;
-      default:
-        return '';
-    }
+      asset: { type, subType },
+      assetName: this.gameBlock.blockName({ type, subType }, true)
+    } as PartAsset;
   }
 
 }

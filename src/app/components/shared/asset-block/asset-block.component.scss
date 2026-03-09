@@ -178,10 +178,10 @@ $food-delicious: blueviolet;
   &.round-bottom-left {
     transform: rotate(90deg);
   }
-  &.fail {
+  &.defeat {
     filter: hue-rotate(180deg) saturate(200%) brightness(60%);
   }
-  &.success {
+  &.victory {
     filter: hue-rotate(-40deg) saturate(200%) brightness(80%);
   }
 }

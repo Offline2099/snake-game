@@ -1,12 +1,11 @@
-import { Component, ChangeDetectorRef, HostListener, input, output } from '@angular/core';
-import { Subscription, interval } from 'rxjs';
+import { Component, ChangeDetectorRef, input, output } from '@angular/core';
+import { interval, Subscription } from 'rxjs';
 // Constants & Enums
 import { GameState } from '../../../constants/game/game-state.enum';
-import { DIRECTION_BY_KEY } from '../../../constants/general/direction/direction-by-key';
+import { DIRECTION_BY_KEY } from '../../../constants/general/direction-by-key';
 // Interfaces & Types
-import { Game } from '../../../types/game/game.interface';
 import { Level } from '../../../types/level/level.interface';
-import { Snake } from '../../../types/snake/snake.interface.ts';
+import { Game } from '../../../types/game/game.interface';
 // Components
 import { GameStatsComponent } from '../03-game-stats/game-stats.component';
 import { GameProgressComponent } from '../04-game-progress/game-progress.component';
@@ -15,12 +14,12 @@ import { GameInstructionsComponent } from '../06-game-instructions/game-instruct
 import { GameControlsComponent } from '../07-game-controls/game-controls.component';
 // Services
 import { GameService } from '../../../services/game/game.service';
-import { SnakeService } from '../../../services/snake.service';
 import { ProgressionService } from '../../../services/progression.service';
 
 @Component({
   selector: 'app-level',
-  imports: [
+  host: { '(window:keydown)': 'onKeyboardEvent($event)' },
+  imports: [ 
     GameStatsComponent,
     GameProgressComponent,
     GameAreaComponent,
@@ -32,25 +31,20 @@ import { ProgressionService } from '../../../services/progression.service';
 })
 export class LevelComponent {
 
-  @HostListener('window:keydown', ['$event']) onKeyboardEvent(event: KeyboardEvent): void {
-    event.preventDefault();
-    this.handleKeyboardEvent(event.key);
-  }
-
   level = input.required<Level>();
   nextLevelId = input.required<number | null>();
 
   victory = output<void>();
   toMenu = output<void>();
 
-  snake!: Snake;
   game!: Game;
-  
+  previousProgress: number = 0;
+  latestChange: number = 0;
+
   timer: Subscription | null = null;
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private snakeService: SnakeService,
     private gameService: GameService,
     private progression: ProgressionService
   ) {}
@@ -61,15 +55,14 @@ export class LevelComponent {
 
   resetGame(): void {
     this.stopTimer();
-    this.snake = this.snakeService.createSnake();
-    this.game = this.gameService.initialize(this.snake, this.level());
+    this.game = this.gameService.initialize(this.level());
   }
 
   startTimer(): void {
     if (this.timer) this.stopTimer();
     this.game.state = GameState.running;
     this.timer = interval(this.game.stepTime).subscribe(() => {
-      this.processGameStep(this.game, this.snake, this.level());
+      this.processGameStep(this.game, this.level());
       this.cdr.markForCheck();
     });
   }
@@ -80,20 +73,28 @@ export class LevelComponent {
     this.timer = null;
   }
 
-  processGameStep(game: Game, snake: Snake, level: Level): void {
-    this.gameService.processStep(game, snake, level);
-    if (game.state === GameState.defeat || game.state === GameState.victory) {
-      this.stopTimer();
-      this.progression.updateLevelProgression(game, this.level(), this.nextLevelId());
-      if (game.state === GameState.victory) this.victory.emit();
-    }
+  processGameStep(game: Game, level: Level): void {
+    this.previousProgress = game.progress;
+    this.gameService.processStep(game, level);
+    this.latestChange = game.progress - this.previousProgress;
+    if (this.gameService.hasEnded(game)) this.finishGame(game, level);;
+  }
+
+  finishGame(game: Game, level: Level): void {
+    this.stopTimer();
+    this.previousProgress = 0;
+    this.latestChange = 0;
+    this.progression.updateLevelProgression(game, level, this.nextLevelId());
+    if (game.state === GameState.victory) this.victory.emit();
   }
 
   showMenu(): void {
     this.toMenu.emit();
   }
 
-  handleKeyboardEvent(key: string): void {
+  onKeyboardEvent(event: KeyboardEvent): void {
+    event.preventDefault();
+    const key: string = event.key;
     if (key === 'Escape') this.showMenu();
     switch (this.game.state) {
       case GameState.ready:
@@ -101,7 +102,7 @@ export class LevelComponent {
         break;
       case GameState.running:
         if (DIRECTION_BY_KEY[key] !== undefined) 
-          this.gameService.changeSnakeDirection(this.game, this.snake, key)
+          this.gameService.changeSnakeDirection(this.game, key)
         break;
       case GameState.defeat:
         if (key === ' ' || key === 'Enter') this.resetGame();

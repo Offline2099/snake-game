@@ -69,6 +69,12 @@
 @if (game().state === GameState.victory) {
   <div class="controls-overlay victory">
     <div class="overlay-header">VICTORY</div>
+    @if (isLastLevel() && !hasWonBefore) {
+      <div class="victory-message">
+        <div><b>Congratulations!</b></div>
+        <div>You are one of the few who have successfully completed the final level. What a journey it's been! Enjoy your victory!</div>
+      </div>
+    }
     @if (isNewBestTime()) {
       <ng-template
         [ngTemplateOutlet]="time"
@@ -78,7 +84,7 @@
       @if (hasWonBefore) {
         <ng-template
           [ngTemplateOutlet]="time"
-          [ngTemplateOutletContext]="{ text: 'Current Run', value: game().stats.elapsedTime }"
+          [ngTemplateOutletContext]="{ text: 'Current Game', value: game().stats.elapsedTime }"
         />
         <ng-template
           [ngTemplateOutlet]="time"

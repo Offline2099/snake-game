@@ -3,14 +3,17 @@ import { Injectable } from '@angular/core';
 import { Position } from '../../types/general/position.interface';
 import { Rectangle } from '../../types/general/rectangle.interface';
 import { Portal } from '../../types/general/portal.interface';
-import { GameBlockBase } from '../../types/game/space/game-block-base.interface';
+import { Level } from '../../types/level/level.interface';
+import { Space } from '../../types/game/space.type';
+import { GameBlock } from '../../types/game/space-block/game-block.interface';
 import { LevelMapData } from '../../types/level/map/level-map-data.interface';
 import { LevelMapArea } from '../../types/level/map/level-map-area.interface';
 import { Wall } from '../../types/level/map/wall.interface';
 // Services
-import { GeometryService } from '../general/geometry.service';
 import { UtilityService } from '../general/utility.service';
+import { GeometryService } from '../general/geometry.service';
 import { GameBlockService } from '../game/game-block.service';
+import { SpaceService } from '../game/space.service';
 import { AreaService } from './area.service';
 import { WallService } from './wall.service';
 
@@ -20,18 +23,100 @@ import { WallService } from './wall.service';
 export class LevelService {
 
   constructor(
-    private geometry: GeometryService,
     private utility: UtilityService,
+    private geometry: GeometryService,
     private gameBlock: GameBlockService,
+    private spaceService: SpaceService,
     private areaService: AreaService,
     private wallService: WallService
-  ) { }
+  ) {}
+
+  //===========================================================================
+  //  Level Map Setup
+  //===========================================================================
+
+  setLevelMap(space: Space, level: Level): void {
+    if (!level.settings.map) return;
+    this.setMapEntities(space, level);
+    this.setMapAreas(space, level);
+    this.setWalls(space, level);
+    this.setPortals(space, level);
+  }
+
+  private setMapEntities(space: Space, level: Level): void {
+    if (!level.settings.map?.entities) return;
+    Object.entries(level.settings.map.entities).forEach(([x, value]) => 
+      Object.entries(value).forEach(([y, block]) => {
+        const position: Position = { x: Number(x), y: Number(y) };
+        this.setEntity(space, level, position, block);
+      })
+    );
+  }
+
+  private setMapAreas(space: Space, level: Level): void {
+    if (!level.settings.map?.areas) return;
+    level.settings.map.areas.forEach(area => 
+      this.areaService.includedPositions(area).forEach(position => 
+        this.setEntity(space, level, position, area.block)
+      )
+    );
+  }
+
+  private setWalls(space: Space, level: Level): void {
+    if (!level.settings.map?.walls) return;
+    level.settings.map.walls.forEach(wall => 
+      this.areaService.includedPositions(wall).forEach(position => 
+        this.setEntity(space, level, position, this.wallService.currentBlock(wall, position))
+      )
+    );
+  }
+
+  private setPortals(space: Space, level: Level): void {
+    if (!level.settings.map?.portals) return;
+    level.settings.map.portals.forEach(portal => {
+      this.setEntity(space, level, portal.entrance, this.gameBlock.portalEntrance(portal.exit));
+      this.setEntity(space, level, portal.exit, this.gameBlock.portalExit());
+    });
+  }
+
+  private setEntity(space: Space, level: Level, position: Position, block: GameBlock): void {
+    this.spaceService.setBlock(space, position, block);
+    this.spaceService.protectEntity(space, level, position, block.type);
+  }
+
+  //===========================================================================
+  //  Counters
+  //===========================================================================
+
+  countEntities(level: Level, block: GameBlock): number {
+    return this.countSingleEntities(level, block) + this.countEntitiesInAreas(level, block);
+  }
+
+  private countSingleEntities(level: Level, block: GameBlock): number {
+    if (!level.settings.map?.entities) return 0;
+    return Object.values(level.settings.map.entities).reduce((acc, x) => {
+      acc += Object.values(x).reduce((accX, data) => {
+        accX += this.gameBlock.areBlocksEqual(data, block) ? 1 : 0;
+        return accX;
+      }, 0);
+      return acc;
+    }, 0);
+  }
+
+  private countEntitiesInAreas(level: Level, block: GameBlock): number {
+    if (!level.settings.map?.areas) return 0;
+    return level.settings.map.areas.reduce((acc, area) => {
+      if (this.gameBlock.areBlocksEqual(area.block, block))
+        acc += this.areaService.includedPositions(area).length;
+      return acc;
+    }, 0);
+  }
 
   //===========================================================================
   //  Level Map: Single Block Entitites
   //===========================================================================
 
-  addMapEntity(map: LevelMapData, position: Position, block: GameBlockBase): void {
+  addMapEntity(map: LevelMapData, position: Position, block: GameBlock): void {
     const keepEntity: boolean = this.resolveOverlapForEntity(map, position, block);
     if (!keepEntity) return;
     if (!map.entities) map.entities = {};
@@ -48,13 +133,13 @@ export class LevelService {
     if (this.utility.isEmptyObject(map.entities)) delete map.entities;
   }
 
-  private resolveOverlapForEntity(map: LevelMapData, position: Position, block?: GameBlockBase): boolean {
+  private resolveOverlapForEntity(map: LevelMapData, position: Position, block?: GameBlock): boolean {
     return this.resolveEntityOverlapWithAreas(map, position, block)
       && this.resolveEntityOverlapWithWalls(map, position, block)
       && this.resolveEntityOverlapWithPortals(map, position);
   }
 
-  resolveEntityOverlapWithAreas(map: LevelMapData, position: Position, block?: GameBlockBase): boolean {
+  resolveEntityOverlapWithAreas(map: LevelMapData, position: Position, block?: GameBlock): boolean {
     if (!map.areas) return true;
     let keepEntity: boolean = true;
     map.areas.forEach(area => {
@@ -69,7 +154,7 @@ export class LevelService {
     return keepEntity;
   }
 
-  resolveEntityOverlapWithWalls(map: LevelMapData, position: Position, block?: GameBlockBase): boolean {
+  resolveEntityOverlapWithWalls(map: LevelMapData, position: Position, block?: GameBlock): boolean {
     if (!map.walls) return true;
     let keepEntity: boolean = true;
     map.walls.forEach(wall => {
@@ -97,7 +182,7 @@ export class LevelService {
   //  Level Map: Areas
   //===========================================================================
 
-  addMapArea(map: LevelMapData, rectangle: Rectangle, block: GameBlockBase): void {
+  addMapArea(map: LevelMapData, rectangle: Rectangle, block: GameBlock): void {
     if (this.geometry.isSingleBlock(rectangle)) {
       this.addMapEntity(map, rectangle.topLeft, block);
       return;
@@ -142,7 +227,7 @@ export class LevelService {
     }
     const rectangle: Rectangle | null = this.geometry.rectangleFromPositions(included);
     if (rectangle) {
-      const block: GameBlockBase = area.block;
+      const block: GameBlock = area.block;
       this.removeMapArea(map, area);
       this.addMapArea(map, rectangle, block);
     }

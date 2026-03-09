@@ -1,16 +1,16 @@
 <div class="wrapper">
-  @for (level of levels(); track level().id) {
+  @for (level of levels(); track level.id) {
     <div
       class="level-block"
-      [ngClass]="{ 'locked': level().progression.isLocked }"
-      (click)="selectLevel(level().id)">
+      [ngClass]="{ 'locked': level.progression.isLocked }"
+      (click)="selectLevel(level)">
 
       <!-- Upper Block (Image) -->
       <div class="upper-block">
-        @if (level().progression.isLocked) {
+        @if (level.progression.isLocked) {
           <img class="block-icon lock" src="images/menu/lock.webp" alt="" />
         } @else {
-          @if (level().progression.isComplete) {
+          @if (level.progression.isComplete) {
             <img class="block-icon" src="images/menu/checkmark.webp" alt="" />
           }
         }
@@ -18,22 +18,22 @@
       
       <!-- Middle Block (Level Number & Name) -->
       <div class="middle-block">
-        <div>Level {{ level().id }}</div>
-        <div class="level-name">{{ level().name }}</div>
+        <div>Level {{ level.id }}</div>
+        <div class="level-name">{{ level.name }}</div>
       </div>
 
       <!-- Bottom Block (Progression Stats) -->
       <div class="bottom-block">
-        @if (!level().progression.isLocked) {
-          @if (level().progression.isComplete) {
-            <div class="progress-record">Best Time: {{ level().progression.bestTime | secondsAsTime }}</div>
+        @if (!level.progression.isLocked) {
+          @if (level.progression.isComplete) {
+            <div class="progress-record">Best Time: {{ level.progression.bestTime | secondsAsTime }}</div>
           } @else {
-            @if (level().progression.bestProgress) {
+            @if (level.progression.bestProgress) {
               <div class="progress-record">
                 <ng-container>Best Attempt: </ng-container>
-                <ng-container>{{ level().progression.bestProgress }}</ng-container>
+                <ng-container>{{ level.progression.bestProgress }}</ng-container>
                 <ng-container>&hairsp;/&hairsp;</ng-container>
-                <ng-container>{{ level().settings.goal }}</ng-container>
+                <ng-container>{{ level.settings.goal }}</ng-container>
               </div>
             }
           }

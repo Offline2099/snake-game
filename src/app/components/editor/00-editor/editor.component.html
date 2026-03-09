@@ -1,3 +1,6 @@
+<!-- Background -->
+<app-background [settings]="EDITOR_BG_SETTINGS" />
+
 <!-- Load & Save JSON -->
 <div class="wrapper">
   <input type="file" [id]="EditorInputId.file" (change)="onFileChange($event)" accept=".json" />
@@ -49,6 +52,3 @@
   </div>
   
 </div>
-
-<!-- Background -->
- <app-background [hue]="EDITOR_BG_HUE" />

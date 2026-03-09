@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 // Constants & Enums
-import { Orientation } from '../../constants/general/orientation/orientation.enum';
-import { ObstacleType } from '../../constants/obstacles/obstacle-type.enum';
+import { Orientation } from '../../constants/general/orientation.enum';
+import { ObstacleType } from '../../constants/game/obstacles/obstacle-type.enum';
 // Interfaces & types
 import { Position } from '../../types/general/position.interface';
-import { GameBlockBase } from '../../types/game/space/game-block-base.interface';
+import { GameBlock } from '../../types/game/space-block/game-block.interface';
 import { Wall } from '../../types/level/map/wall.interface';
 // Services
 import { GeometryService } from '../general/geometry.service';
@@ -48,7 +48,7 @@ export class WallService {
     return Orientation.vertical;
   }
 
-  orientationByBodyBlock(block: GameBlockBase): Orientation {
+  orientationByBodyBlock(block: GameBlock): Orientation {
     return WALL_ORIENTATION[block.subType as WallType];
   }
 
@@ -69,19 +69,19 @@ export class WallService {
     return this.geometry.isSamePosition(wall.rectangle.bottomRight, position);
   }
 
-  startBlock(orientaion: Orientation): GameBlockBase {
+  startBlock(orientaion: Orientation): GameBlock {
     return this.gameBlock.obstacle(WALL_START_BLOCK[orientaion]);
   }
 
-  bodyBlock(orientaion: Orientation): GameBlockBase {
+  bodyBlock(orientaion: Orientation): GameBlock {
     return this.gameBlock.obstacle(WALL_BODY_BLOCK[orientaion]);
   }
 
-  endBlock(orientaion: Orientation): GameBlockBase {
+  endBlock(orientaion: Orientation): GameBlock {
     return this.gameBlock.obstacle(WALL_END_BLOCK[orientaion]);
   }
 
-  currentBlock(wall: Wall, position: Position): GameBlockBase {
+  currentBlock(wall: Wall, position: Position): GameBlock {
     const orientaion: Orientation = this.orientation(wall);
     if (this.isWallStart(wall, position)) 
       return wall.noStartBlock ? this.bodyBlock(orientaion) : this.startBlock(orientaion);
@@ -90,7 +90,7 @@ export class WallService {
     return this.bodyBlock(orientaion);
   }
 
-  isSuitableBlock(wall: Wall, position: Position, block: GameBlockBase): boolean {
+  isSuitableBlock(wall: Wall, position: Position, block: GameBlock): boolean {
     const orientaion: Orientation = this.orientation(wall);
     return this.gameBlock.areBlocksEqual(block, this.bodyBlock(orientaion))
       || (this.isWallStart(wall, position)
@@ -99,7 +99,7 @@ export class WallService {
         && this.gameBlock.areBlocksEqual(block, this.endBlock(orientaion)));
   }
 
-  updateWallEnds(wall: Wall, position: Position, block: GameBlockBase): void {
+  updateWallEnds(wall: Wall, position: Position, block: GameBlock): void {
     const orientaion: Orientation = this.orientation(wall);
     if (this.isWallStart(wall, position)) 
       wall.noStartBlock = !this.gameBlock.areBlocksEqual(block, this.startBlock(orientaion));

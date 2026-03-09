@@ -1,0 +1,1 @@
+export const DEFAULT_STEP_TIME_MS: number = 150;
