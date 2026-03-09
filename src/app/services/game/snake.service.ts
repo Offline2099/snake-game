@@ -159,6 +159,7 @@ export class SnakeService {
       : lastBodyBlock.currentPosition;
     snake.tail.currentDirection = 
       this.geometry.getDirection(snake.tail.currentPosition, previousBlockPosition);
+    snake.tail.teleportedBy = lastBodyBlock.teleportedBy;
   }
 
   //===========================================================================
@@ -166,17 +167,26 @@ export class SnakeService {
   //===========================================================================
 
   growSnake(snake: Snake): void {
-    snake.body.push(this.createBodyBlock(
+    const block: BodyBlock = this.createBodyBlock(
       snake.tail.currentPosition,
       snake.tail.currentDirection,
       this.geometry.oppositeDirection(snake.tail.previousDirection)
-    ));
+    );
+    if (snake.tail.teleportedBy) block.teleportedBy = { ...snake.tail.teleportedBy };
+    snake.body.push(block);
     snake.tail = this.createTailBlock(snake.tail.previousPosition, snake.tail.previousDirection);
   }
 
   takeDamage(snake: Snake, amount: number): void {
     snake.body.splice(snake.body.length - Math.min(snake.body.length - 1, amount));
-    this.moveTailBlock(snake);
+    const lastBodyBlock: SnakeBlock = snake.body[snake.body.length - 1];
+    const previousBlockPosition = lastBodyBlock.teleportedBy
+      ? lastBodyBlock.teleportedBy.entrance
+      : lastBodyBlock.currentPosition;
+    snake.tail = this.createTailBlock(
+      lastBodyBlock.previousPosition,
+      this.geometry.getDirection(lastBodyBlock.previousPosition, previousBlockPosition)
+    );
   }
 
 }
