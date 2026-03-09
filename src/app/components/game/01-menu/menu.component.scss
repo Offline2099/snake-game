@@ -9,13 +9,13 @@
   display: grid;
   flex-grow: 1;
   grid-template-columns: repeat(5, 1fr);
-  width: $menu-content-width;
+  width: 1600px;
   min-height: 670px;
   max-height: 1075px;
   margin: 25px 0;
   gap: 25px;
   @include hd {
-    width: $menu-content-width-hd;
+    width: 1200px;
     max-height: 830px;
     gap: 10px;
   }

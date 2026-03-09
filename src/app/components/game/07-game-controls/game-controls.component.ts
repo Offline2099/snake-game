@@ -38,7 +38,7 @@ export class GameControlsComponent {
   bestTime: number = 0;
   hasWonBefore: boolean = false;
 
-  ngOnInit(): void {
+  ngOnChanges(): void {
     this.updateBestScore();
   }
 

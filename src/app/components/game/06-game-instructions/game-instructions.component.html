@@ -21,7 +21,7 @@
             }
             @case (InstructionPartType.asset) {
               <span class="item-container">
-                <app-asset-block [type]="part.assetType" [subType]="part.assetSubType" />
+                <app-asset-block [block]="part.asset" />
                 <ng-container>{{ part.assetName }}</ng-container>
               </span>
             }

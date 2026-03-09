@@ -14,17 +14,15 @@ export class GameProgressComponent {
 
   gameState = input.required<GameState>();
   progress = input.required<number>();
+  latestChange = input.required<number>();
   goal = input.required<number>();
 
   percentage = computed(() => Math.floor(100 * this.progress() / this.goal()));
-
-  previousProgress: number = 0;
-  latestChange: number = 0;
-
+  latestProgress: number = 0;
+  
   constructor() {
     effect(() => {
-      this.latestChange = this.progress() - this.previousProgress;
-      this.previousProgress = this.progress();
+      if (this.latestChange()) this.latestProgress = this.latestChange();
     });
   }
 

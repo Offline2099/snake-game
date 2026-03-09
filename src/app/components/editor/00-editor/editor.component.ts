@@ -4,14 +4,14 @@ import { NgClass } from '@angular/common';
 import { EditorTabId } from '../../../constants/editor/editor-tab-id.enum';
 import { EditorInputId } from '../../../constants/editor/editor-input-id.enum';
 import { EDITOR_TABS } from '../../../constants/editor/editor-tabs';
-import { DEFAULT_LEVEL_DATA } from '../../../constants/level/default-level-settings';
+import { DEFAULT_SETTINGS } from '../../../constants/level/default-settings';
 import { DEFAULT_SELECTED_ASSET } from '../../../constants/editor/default-selected-asset';
 import { AssetPlacingModeId } from '../../../constants/editor/asset-placing-mode-id.enum';
-import { EDITOR_BG_HUE } from '../../../constants/backgrounds';
 // Interfaces & Types
 import { EditorTab } from '../../../types/editor/editor-tab.interface';
 import { LevelData } from '../../../types/level/level-data.interface';
-import { GameBlockBase } from '../../../types/game/space/game-block-base.interface';
+import { GameBlock } from '../../../types/game/space-block/game-block.interface';
+import { BackgroundSettings } from '../../../types/background/background-settings.interface';
 // Components
 import { BackgroundComponent } from '../../shared/background/background.component';
 import { AreaComponent } from '../01-area/area.component';
@@ -20,6 +20,11 @@ import { PropertiesComponent } from '../03-properties/properties.component';
 // Services
 import { FileService } from '../../../services/general/file.service';
 
+const EDITOR_BG_SETTINGS: BackgroundSettings = {
+  hue: 160,
+  saturation: 25,
+  lightness: 0.7
+}
 
 @Component({
   selector: 'app-editor',
@@ -32,11 +37,11 @@ export class EditorComponent {
   readonly EditorInputId = EditorInputId;
   readonly EditorTabId = EditorTabId;
   readonly EDITOR_TABS = EDITOR_TABS;
-  readonly EDITOR_BG_HUE = EDITOR_BG_HUE;
+  readonly EDITOR_BG_SETTINGS= EDITOR_BG_SETTINGS;
 
-  level = signal<LevelData>({ ...DEFAULT_LEVEL_DATA });
+  level = signal<LevelData>({ ...DEFAULT_SETTINGS, id: 1 });
   selectedTabId: EditorTabId = EditorTabId.assets;
-  selectedAsset: GameBlockBase = { ...DEFAULT_SELECTED_ASSET };
+  selectedAsset: GameBlock = { ...DEFAULT_SELECTED_ASSET };
   selectedMode: AssetPlacingModeId = AssetPlacingModeId.single;
   previousMode: AssetPlacingModeId = AssetPlacingModeId.single;
 

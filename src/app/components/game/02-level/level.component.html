@@ -7,21 +7,22 @@
 
   <!-- Left Column -->
   <div class="side-column">
-    <app-game-stats [game]="game" [level]="level()" [snake]="snake" />
+    <app-game-stats [game]="game" />
   </div>
 
   <!-- Central Column -->
   <div class="main-column">
-    <app-game-progress
+    <app-game-progress 
       [gameState]="game.state"
       [progress]="game.progress"
+      [latestChange]="latestChange"
       [goal]="level().settings.goal"
     />
     <app-game-area
       [space]="game.space"
       [gameState]="game.state"
-      [progress]="game.progress"
-      [headPosition]="snake.head.currentPosition"
+      [latestChange]="latestChange"
+      [headPosition]="game.snake.head.currentPosition"
     />
   </div>
 

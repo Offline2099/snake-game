@@ -1,6 +1,6 @@
-import { GameBlockBase } from '../../game/space/game-block-base.interface';
+import { GameBlock } from '../../game/space-block/game-block.interface';
 import { Area } from './area.interface';
 
 export interface LevelMapArea extends Area {
-  block: GameBlockBase;
+  block: GameBlock;
 }

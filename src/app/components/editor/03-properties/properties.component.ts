@@ -6,12 +6,12 @@ import { PROPERTY_TABS } from '../../../constants/editor/property-tabs';
 import { PropertyTabId } from '../../../constants/editor/property-tab-id.enum';
 import { EditorInputId } from '../../../constants/editor/editor-input-id.enum';
 import { EntityParameterId } from '../../../constants/level/entity-parameter-id.enum';
-import { GameBlockType } from '../../../constants/game/game-block-type.enum';
-import { ProtectionType } from '../../../constants/game/protection-type.enum';
-import { FoodType } from '../../../constants/food/food-type.enum';
-import { EnemyType } from '../../../constants/enemies/enemy-type.enum';
-import { FOOD_DATA } from '../../../constants/food/food-data';
-import { ENEMY_DATA } from '../../../constants/enemies/enemy-data';
+import { GameBlockType } from '../../../constants/game/space-block/game-block-type.enum';
+import { ProtectionType } from '../../../constants/game/space-protection/protection-type.enum';
+import { FoodType } from '../../../constants/game/food/food-type.enum';
+import { EnemyType } from '../../../constants/game/enemies/enemy-type.enum';
+import { FOOD_DATA } from '../../../constants/game/food/food-data';
+import { ENEMY_DATA } from '../../../constants/game/enemies/enemy-data';
 // Interfaces & Types
 import { EditorTab } from '../../../types/editor/editor-tab.interface';
 import { LevelData } from '../../../types/level/level-data.interface';

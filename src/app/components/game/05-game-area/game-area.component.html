@@ -4,15 +4,14 @@
       @if (block.type !== GameBlockType.free) {
         <app-asset-block 
           class="game-block"
-          [type]="block.type"
-          [subType]="block.subType"
+          [block]="block"
           [ngStyle]="{
-            'left.px': BLOCK_SIZE * x,
-            'bottom.px': BLOCK_SIZE * y
+            'left.px': BLOCK_SIZE_PX * x,
+            'bottom.px': BLOCK_SIZE_PX * y
           }"
           [ngClass]="{
-            'fail': gameState() === GameState.defeat,
-            'success': gameState() === GameState.victory
+            'defeat': gameState() === GameState.defeat,
+            'victory': gameState() === GameState.victory
           }"
         />
       }
@@ -23,13 +22,10 @@
       class="progress-value"
       [ngClass]="{ 'damage': change.value < 0 }"
       [ngStyle]="{
-        'left.px': BLOCK_SIZE * (change.position.x + .5),
-        'bottom.px': BLOCK_SIZE * (change.position.y + .5)
+        'left.px': BLOCK_SIZE_PX * (change.position.x + .5),
+        'bottom.px': BLOCK_SIZE_PX * (change.position.y + .5)
       }">
-      @if (change.value > 0) {
-        <ng-container>+</ng-container>
-      }
-      <ng-container>{{ change.value }}</ng-container>
+      <ng-container>{{ change.value > 0 ? '+' : '' }}{{ change.value }}</ng-container>
     </div>
   }
 </div>

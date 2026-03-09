@@ -12,7 +12,7 @@
 <div class="tooltip-section">
   <div class="tooltip-line">
     @if (blockUnderCursor(); as block) {
-      <app-asset-block [type]="block.type" [subType]="block.subType" />
+      <app-asset-block [block]="block" />
       <span>&nbsp;{{ block.name }}</span>
     } @else { 
       <ng-container>Empty block</ng-container>
@@ -25,7 +25,7 @@
   <div class="tooltip-section">
     <div class="tooltip-line">
       <b>Area of&nbsp;</b>
-      <app-asset-block [type]="area.block.type" [subType]="area.block.subType" />
+      <app-asset-block [block]="area.block" />
       <span>
         <ng-container>&nbsp;(&hairsp;</ng-container>
         <ng-container>{{ area.rectangle.bottomRight.x - area.rectangle.topLeft.x + 1 }}</ng-container>
@@ -255,7 +255,7 @@
       <span>{{ text }}&thinsp;</span>
     }
     @if (block) {
-      <app-asset-block [type]="block.type" [subType]="block.subType" />
+      <app-asset-block [block]="block" />
     }    
   </div>
 </ng-template>

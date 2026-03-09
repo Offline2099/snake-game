@@ -2,6 +2,9 @@
 
 :host {
   @include page;
+  & > * {
+    animation: fade-in .5s .1s both;
+  }
 }
 
 @mixin width {
