@@ -8,21 +8,23 @@
   display: flex;
   padding: 5px;
   gap: 5px;
+  a {
+    color: $text-selected;
+    font-size: 14px;
+    text-decoration: none;
+  }
   button {
     height: 30px;
     padding: 0 10px;
     border: 2px solid #004433;
     border-radius: 4px;
     background: #223322;
+    color: inherit;
+    font-family: inherit;
     opacity: .7;
     transition: .2s;
     @include hover {
       opacity: 1;
-    }
-    a {
-      color: $text-selected;
-      font-size: 14px;
-      text-decoration: none;
     }
   }
 }

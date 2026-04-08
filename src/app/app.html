@@ -1,11 +1,13 @@
 <router-outlet />
 
 <div class="app-controls">
-  <button type="button">
-    @if (isEditorOpen$ | async) {
-      <a routerLink="/">Game</a>
-    } @else {
-      <a routerLink="/editor">Level Editor</a>
-    }    
-  </button>
+  @if (isEditorOpen$ | async) {
+    <a routerLink="/">
+      <button type="button">Game</button>
+    </a>
+  } @else {
+    <a routerLink="/editor">
+      <button type="button">Level Editor</button>
+    </a>
+  }
 </div>
