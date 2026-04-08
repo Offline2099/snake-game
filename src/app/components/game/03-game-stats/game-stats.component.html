@@ -89,7 +89,7 @@
         @if (game().stats.enemies[enemyType].present || game().stats.enemies[enemyType].hit) {
           <tr>
             <td>
-              <app-asset-block [block]="{ type: GameBlockType.food, subType: enemyType }" />
+              <app-asset-block [block]="{ type: GameBlockType.enemy, subType: enemyType }" />
               <span>{{ ENEMY_DATA[enemyType].name }}</span>
             </td>
             <td>{{ game().stats.enemies[enemyType].present }}</td>
